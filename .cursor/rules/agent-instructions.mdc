@@ -1,0 +1,20 @@
+---
+description: Follow docs/instructions.md as the agent system prompt for this video repo
+alwaysApply: true
+---
+
+# Agent rules for this repo
+
+Before building scenes, editing the script map, rendering, or muxing, follow **`docs/instructions.md`** as your system prompt.
+
+Process lineage: same hard rules as video 2 (`../../../ai-image-explainer/docs/instructions.md`) and the video-1 repo  
+[`../../../1-hour-challenge/docs/instructions.md`](../../../1-hour-challenge/docs/instructions.md)  
+(and launch lessons in that repo’s `docs/launch_analytics_notes.md`).
+
+Hard rules:
+
+1. **`docs/script_visual_map.md` is the contract** — do not invent on-screen labels/numbers outside it.
+2. **Bit workflow:** Arabic paragraph (Ali) → agent proposes animation → Ali **approves** → only then write Manim. Never code a new bit before approval.
+3. After a useful render, export ~8–12 frames to `keyframes/<segment_id>/` via `scripts/export_keyframes.py`.
+4. Preview render by default; HD only when Ali asks. Skip-up-to-date render/mux is default; `--force` rebuilds.
+5. Do not import or depend on `1-hour-challenge/our_scenes` at runtime — copy/adapt helpers into this repo if needed.

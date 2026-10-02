@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "recorder",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["scripts/record_server.py"],
+      "port": 8765
+    }
+  ]
+}

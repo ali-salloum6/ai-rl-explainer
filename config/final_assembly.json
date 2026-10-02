@@ -1,0 +1,15 @@
+{
+  "output": "media/output/final_with_music.mp4",
+  "narration_manifest": "config/audio_manifest.json",
+  "segment_order": [],
+  "music": {
+    "files": [],
+    "volume": 0.14,
+    "loop": true
+  },
+  "ffmpeg": {
+    "audio_codec": "aac",
+    "audio_bitrate": "192k"
+  },
+  "notes": "Fill segment_order and music.files when the cut exists. Same assembly pattern as ../1-hour-challenge/config/final_assembly.json."
+}

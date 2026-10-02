@@ -1,0 +1,11 @@
+# ManimGL project defaults when you run `manimgl` from the repo root.
+# file default 1920×1080; day-to-day renders use `-w -l` via ./scripts/render_all.sh (see docs/instructions.md).
+# Full HD export: MANIM_HD=1 ./scripts/render_all.sh or ./scripts/render_and_build.sh
+camera:
+  # Tuple syntax matches `default_config.yml` / `literal_eval` expectations.
+  resolution: (1920, 1080)
+
+# Write scene MP4s to ./media (matches `config/audio_manifest.json` paths).
+directories:
+  subdirs:
+    output: "media"

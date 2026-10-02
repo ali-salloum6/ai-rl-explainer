@@ -1,0 +1,4 @@
+{
+  "notes": "Pauses INSIDE a recorded line, set by hand. scripts/process_takes.py normally shortens any pause over 0.75 s to 0.5 s; a line listed here gets the pause right before the given word set to exactly `seconds` instead (lengthened with silence if the take's own pause is shorter).",
+  "lines": {}
+}

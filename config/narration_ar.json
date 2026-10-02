@@ -1,0 +1,4 @@
+{
+  "notes": "The Arabic narration as decided in docs/arabic_script.md, one entry per spoken line, grouped by bit (segment id = scene). status: ready (text to record), pending (no decision yet), removed (cut from the video). Read by scripts/record_server.py; regenerated after each round of decisions.",
+  "segments": []
+}

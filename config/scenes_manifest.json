@@ -1,0 +1,4 @@
+{
+  "notes": "Maps segment id (audio_manifest.json) to Manim scene. Optional deps: extra paths that trigger re-render when modified — every scene depends on the narration (its timing follows each line's spoken length), so re-voicing lines marks the renders stale. Pattern from ../1-hour-challenge/config/scenes_manifest.json.",
+  "segments": []
+}

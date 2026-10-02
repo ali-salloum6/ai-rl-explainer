@@ -1,0 +1,4 @@
+{
+  "notes": "The narration script: one entry per spoken line, in order. Edit text here; scripts/narrate.py voices it, and each scene plays line <key> inside `with self.narrate(key):`. `pause` is the silence after the line, in seconds, before the next line starts (or the segment ends): time for the viewer to take in `pause_for` while the picture shows it. Default 0.4 is a breath. Subtitles are derived from the voiced timing.",
+  "segments": []
+}
