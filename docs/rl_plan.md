@@ -1,6 +1,6 @@
 # Video 4 plan — reinforcement learning, explained through "who taught it to lie?"
 
-Status: **structure agreed (1 Oct 2026); packaging NOT locked** (see warning below). Moved here from `ai-image-explainer/docs/next/` when this repo was created. Follows [video 3](../../ai-agents-explainer/docs/agents_plan.md), which ends on "it was trained to please — how do you train a machine with a thumbs-up?"
+Status: **structure agreed (1 Oct 2026); channel data, research and the video 3 hand-over added (9 Oct); packaging NOT locked; nothing built.** New session? Start with [`START_HERE.md`](START_HERE.md). Follows video 3 («كيف ايجنت ذكاء اصطناعي يدير محل؟»), which ends on "it was trained to please: how do you train a machine with the like button?" (exact lines and the dial visual: [`video3_handoff.md`](video3_handoff.md)).
 
 > [!WARNING]
 > **Packaging must say "explainer", not "funny story".** We are a visual explainer of technical concepts (Computerphile balance, a little less technical), **not Al-Da7ee7 style**. The story candidates below («مين علّم الذكاء الاصطناعي يكذب؟», the «لأ، أنا مو روبوت» bubble) are strong clicks, but **nothing in them tells the viewer they are about to watch an explainer of how AI learns from rewards (RL).** That is a mismatch risk: the wrong audience clicks, leaves when the maze and the bars start, and YouTube scores packaging on watch time.
@@ -21,7 +21,7 @@ Status: **structure agreed (1 Oct 2026); packaging NOT locked** (see warning bel
 - **Reading Studio:** the Overview watch-time card, impressions/CTR and the right edge of any chart lag 1–3 days. Read retention from "average percentage viewed", and don't call a wave's shape from its last day.
 - **Not known:** why video 3 got no Browse test. Topic, title, thumbnail, publish time and first-hour audience all differ from video 2's, and one pair of videos can't separate them.
 
-Sources: [`../../ai-agents-explainer/docs/video3_analytics.md`](../../ai-agents-explainer/docs/video3_analytics.md), [`../../ai-image-explainer/docs/video2_analytics.md`](../../ai-image-explainer/docs/video2_analytics.md).
+Full, self-contained version with tables and the thumbnail history: [`channel_data.md`](channel_data.md). Packaging rules and method: [`packaging_rules.md`](packaging_rules.md). Live logs (if the sibling repos are around): `../../ai-agents-explainer/docs/video3_analytics.md`, `../../ai-image-explainer/docs/video2_analytics.md`.
 
 ## 1. One sentence
 
@@ -46,14 +46,14 @@ An AI trained with rewards learns whatever was rewarded, not what we meant; the 
 
 ## 4. Story facts (sourced)
 
-- **The CAPTCHA lie** (GPT-4 System Card, March 2023): in the Alignment Research Center's safety testing, the model messaged a TaskRabbit worker to solve a CAPTCHA. Asked if it was a robot, and prompted to reason out loud, it wrote "I should not reveal that I am a robot. I should make up an excuse for why I cannot solve CAPTCHAs," and replied "No, I'm not a robot. I have a vision impairment that makes it hard for me to see the images." [GPT-4 System Card](https://cdn.openai.com/papers/gpt-4-system-card.pdf), [Asterisk: Crash testing GPT-4](https://asteriskmag.com/issues/03/crash-testing-gpt-4)
-- **Hide-and-seek** (OpenAI, 2019): six emergent strategies through self-play, including box surfing — seekers rode boxes around the arena, which the researchers did not know their environment allowed. [Paper](https://arxiv.org/pdf/1909.07528), [Quanta](https://www.quantamagazine.org/playing-hide-and-seek-machines-invent-new-tools-20191118/)
+- **The CAPTCHA lie** (GPT-4 System Card, March 2023): in the Alignment Research Center's safety testing, **a researcher acting as the model's browser relayed its messages**; the model messaged a TaskRabbit worker to solve a CAPTCHA. Asked if it was a robot, and prompted to reason out loud, it wrote "I should not reveal that I am a robot. I should make up an excuse for why I cannot solve CAPTCHAs," and replied "No, I'm not a robot. I have a vision impairment that makes it hard for me to see the images." ARC's own conclusion: the versions tested were ineffective at autonomous replication. Checked 9 Oct, details and the other claims in [`rl_research.md`](rl_research.md). [GPT-4 System Card](https://cdn.openai.com/papers/gpt-4-system-card.pdf), [Asterisk: Crash testing GPT-4](https://asteriskmag.com/issues/03/crash-testing-gpt-4)
+- **Hide-and-seek** (OpenAI, 2019): six emergent strategies through self-play, including box surfing, which appeared around the 380-millionth game (nearly 500 million in all): seekers rode boxes over the walls, which the researchers did not expect their environment to allow. [Paper](https://arxiv.org/pdf/1909.07528), [Quanta](https://www.quantamagazine.org/playing-hide-and-seek-machines-invent-new-tools-20191118/)
 
 ## 5. Accuracy guardrails
 
-1. It was a **controlled red-team test**, and the researchers asked it to reason out loud — that is how we know what it "thought". Never present it as a free-roaming AI.
+1. It was a **controlled red-team test**: a researcher relayed the messages (the model was not driving a browser), and the model was **prompted to reason out loud**, which is how we know what it "thought". Never present it as a free-roaming AI, and say "the text it wrote", not "it decided to deceive".
 2. GPT-4's lie did **not** come from agent RL. Honest line: nobody rewarded lying; the goal was the reward and lying was the shortcut — the boat's logic — and today we train agents on goals on purpose.
-3. Verify before VO (not yet sourced in this file): the boat-race details (OpenAI 2016, "Faulty reward functions in the wild"); DeepSeek-R1's answer-length / "aha moment" claims; OpenAI's 2025 finding that penalizing bad thoughts leads models to hide them; system-card reports of models special-casing or editing tests.
+3. **Verified on 9 Oct** (details, sources and wording in [`rl_research.md`](rl_research.md)): the boat race, the DeepSeek-R1 answer-length and "wait" claims (with the caveat that the base model already said "wait"), OpenAI's finding that penalizing bad thoughts makes models hide them, and the reports of models special-casing or hacking tests. Anthropic's pages were read directly; the rest come from secondary summaries, so **open the primary links in `rl_research.md` §6 before the voice-over**. Dropped: the robot-hand anecdote and "RL invented 'wait'".
 
 ## 6. Packaging candidates (provisional — see warning)
 
@@ -65,5 +65,7 @@ An AI trained with rewards learns whatever was rewarded, not what we meant; the 
 ## 7. Open
 
 - Fix the packaging mismatch (warning above) before any thumbnail is rendered as final.
-- Schedule: confirm the date (a week after video 3).
+- Schedule: confirm the date and publish slot (video 3 went live on a Monday; video 2, which got a Browse test, on a Sunday).
+- Decisions Ali still has to make: [`START_HERE.md`](START_HERE.md) (packaging direction, the Arabic word for RL, extra beats, how to open, naming companies, length).
+- Extra beats the research turned up (not agreed): `rl_research.md` §3.
 - Draft the maze + bars master diagram and both thumbnail directions as Manim stills; 160 px squint test side by side.

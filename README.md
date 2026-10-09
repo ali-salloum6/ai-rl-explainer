@@ -14,7 +14,12 @@ Working title (not locked): «مين علّم الذكاء الاصطناعي ي
 
 | File | Purpose |
 | ---- | ------- |
+| [`docs/START_HERE.md`](docs/START_HERE.md) | **One-page orientation for a new session**: state, read order, first steps, open decisions |
 | [`docs/rl_plan.md`](docs/rl_plan.md) | Structure, story facts, accuracy guardrails, packaging |
+| [`docs/channel_data.md`](docs/channel_data.md) | The channel's numbers for videos 1–3, patterns, hypotheses, reads to come (self-contained) |
+| [`docs/rl_research.md`](docs/rl_research.md) | The facts the plan leans on, checked, with sources and how to say them |
+| [`docs/video3_handoff.md`](docs/video3_handoff.md) | What video 3 promised and set up, vocabulary, how it was built, tooling drift |
+| [`docs/packaging_rules.md`](docs/packaging_rules.md) | Title/thumbnail rules, method, upload checklist, read schedule |
 | [`docs/context.md`](docs/context.md) | Goals, siblings, what this is not |
 | [`docs/instructions.md`](docs/instructions.md) | **Agent system prompt:** roles, approve-then-build, render/mux, voice pipeline |
 | [`docs/script_visual_map.md`](docs/script_visual_map.md) | **Contract:** Arabic lines ↔ visuals |
@@ -47,4 +52,4 @@ pip install -r manim/requirements.txt
 
 ## Status
 
-Scaffolded 2 Oct 2026 from video 2's repo. No segments yet; packaging not locked.
+Scaffolded 2 Oct 2026 from video 2's repo. **Planning and research done (9 Oct 2026); nothing built; packaging not locked.** The scripts here are the 2 Oct scaffold: video 3's repo has newer ones (see `docs/video3_handoff.md` §4 before using the recorder or `process_takes.py`). New session: read `docs/START_HERE.md`.
