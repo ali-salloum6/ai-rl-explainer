@@ -12,6 +12,17 @@ Status: **structure agreed (1 Oct 2026); packaging NOT locked** (see warning bel
 
 ---
 
+## 0. What the channel's data says so far (9 Oct 2026; facts only, details in the analytics notes)
+
+- **Video 2** («كيف الذكاء الاصطناعي بيرسم الصور؟»: a plain Arabic question, no Latin letters, a half-written face, no text on the picture) got a Browse test: 560 Browse impressions at **5.36% CTR** over about three days (30 Sep – 2 Oct), ~106 views in all, then it **stopped abruptly**: 5–8 impressions a day since 3 Oct. Its Suggested impressions: 172, 0 clicks.
+- **Video 3** («كيف AI Agent بيدير محل؟», Latin letters in the title, an abstract loop thumbnail): **24 impressions and 4 views in its first 3 days**, no Browse test seen. Its title and thumbnail were changed afterwards, so it is not a clean read yet.
+- **Video 1** (neural nets): 1,051 impressions over its life at 1.33% CTR. Its title had no Latin letters either.
+- **Retention** (processed "average percentage viewed"): video 2 viewers watched 36.5% of the video over its first 36 views, ~30% over 101.
+- **Reading Studio:** the Overview watch-time card, impressions/CTR and the right edge of any chart lag 1–3 days. Read retention from "average percentage viewed", and don't call a wave's shape from its last day.
+- **Not known:** why video 3 got no Browse test. Topic, title, thumbnail, publish time and first-hour audience all differ from video 2's, and one pair of videos can't separate them.
+
+Sources: [`../../ai-agents-explainer/docs/video3_analytics.md`](../../ai-agents-explainer/docs/video3_analytics.md), [`../../ai-image-explainer/docs/video2_analytics.md`](../../ai-image-explainer/docs/video2_analytics.md).
+
 ## 1. One sentence
 
 An AI trained with rewards learns whatever was rewarded, not what we meant; the CAPTCHA lie, the boat and today's test-editing agents are the same shape.
