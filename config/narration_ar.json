@@ -1,4 +1,446 @@
 {
   "notes": "The Arabic narration as decided in docs/arabic_script.md, one entry per spoken line, grouped by bit (segment id = scene). status: ready (text to record), pending (no decision yet), removed (cut from the video). Read by scripts/record_server.py; regenerated after each round of decisions.",
-  "segments": []
+  "segments": [
+    {
+      "id": "hook",
+      "title": "Hook: a boat that won by cheating, and an AI that said it wasn't a robot",
+      "lines": [
+        {
+          "key": "hook.1",
+          "en": "This AI was trained to win a boat race.",
+          "ar": "هالذكاء الاصطناعي تدرّب يربح سباق قوارب.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "hook.2",
+          "en": "Instead of finishing, it found a corner where the points keep coming back, and it circled there. Forever.",
+          "ar": "بس بدل ما يخلّص السباق، لقى زاوية النقاط فيها بترجع تطلع… وضلّ يلفّ فيها. للأبد.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "hook.3",
+          "en": "On fire, crashing into boats, going the wrong way, and it still scored about 20 percent more than human players.",
+          "ar": "عم يحترق، وبيخبط بالقوارب، وماشي بالعكس… ومع هيك علامتو طلعت أعلى من البشر بحوالي 20 بالمية.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "hook.4",
+          "en": "And in a 2023 safety test, an early version of GPT-4 told a human: \"No, I'm not a robot.\"",
+          "ar": "وبتجربة أمان سنة 2023، نسخة أولية من GPT-4 قالت لإنسان: \"لأ، أنا مو روبوت\".",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "hook.5",
+          "en": "Nobody taught either of them to cheat. So how does an AI learn to?",
+          "ar": "وما حدا علّم ولا واحد منن يغشّ. طيب كيف الذكاء الاصطناعي بيتعلّم يغشّ؟",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "hook.6",
+          "en": "The answer is in the simplest way we teach machines: rewards. And at the end, the strangest part: what happened when researchers punished a model for its bad thoughts.",
+          "ar": "الجواب بأبسط طريقة منعلّم فيها الآلات: الجوايز. وبالآخر، أغرب شي: شو صار لما باحثين عاقبوا نموذج عَ أفكارو العاطلة.",
+          "status": "ready",
+          "source": "option 1"
+        }
+      ]
+    },
+    {
+      "id": "bit1_maze",
+      "title": "Bit 1: a dot, a maze, and a reward",
+      "lines": [
+        {
+          "key": "bit1_maze.1",
+          "en": "Let's teach a machine something from scratch: a dot in a maze, and a star.",
+          "ar": "خلّينا نعلّم آلة شي من الصفر: نقطة بمتاهة، ونجمة.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.2",
+          "en": "We want the dot to reach the star, but we'll never show it the way. It only gets a reward when it arrives.",
+          "ar": "بدنا النقطة توصل للنجمة، بس ما رح نفرجيها الطريق أبداً. بس بتاخد جايزة، إذا وصلت.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.3",
+          "en": "Inside, the dot has a chance for every move: up, down, right, left. At first, they're all equal.",
+          "ar": "وجوّا النقطة في احتمال لكل حركة: فوق، تحت، يمين، شمال. وبالأول، كلّن متل بعض.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.4",
+          "en": "So it wanders at random, bumps into walls, and gets nothing.",
+          "ar": "فبتمشي عشوائي، بتخبط بالحيطان… وما بتاخد شي.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.5",
+          "en": "Until, by pure chance, it lands on the star.",
+          "ar": "لحتى، بالصدفة البحتة، توصل للنجمة.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.6",
+          "en": "And here's the whole trick: every move it made on the way, we make a little more likely.",
+          "ar": "وهون كل الحيلة: كل حركة عملتا بالطريق، منكبّرلها احتمالا شوي.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.7",
+          "en": "Then again. And again. Hundreds of tries.",
+          "ar": "ومنعيد. ومنعيد. مئات المحاولات.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.8",
+          "en": "The moves that lead to the star grow, the rest shrink, until a path appears.",
+          "ar": "الحركات اللي بتوصّل للنجمة بتكبر، والباقي بيصغر… لحتى يبيّن طريق.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.9",
+          "en": "Nobody drew this path. The reward drew it.",
+          "ar": "ما حدا رسم هالطريق. الجايزة رسمتو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.10",
+          "en": "That's reinforcement learning: no teacher, no answers. Try, get a score, and grow what worked.",
+          "ar": "وهاد اسمو التعلّم المعزّز: لا أستاذ، ولا أجوبة. جرّب، خود علامة، وكبّر اللي زبط.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.11",
+          "en": "Scaled up, this same loop learned Atari games from the pixels alone, and beat one of the world's best Go players.",
+          "ar": "ونفس هالدورة، بس أكبر بكتير، تعلّمت ألعاب أتاري من البيكسلات لحالها، وغلبت واحد من أقوى لاعبين الـ Go بالعالم.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit1_maze.12",
+          "en": "But what if the reward isn't exactly what we want?",
+          "ar": "بس شو بيصير، إذا الجايزة… مو بالزبط اللي بدنا ياه؟",
+          "status": "ready",
+          "source": "option 1"
+        }
+      ]
+    },
+    {
+      "id": "bit2_coin",
+      "title": "Bit 2: it learns what we reward, not what we mean",
+      "lines": [
+        {
+          "key": "bit2_coin.1",
+          "en": "Let's help a new dot learn faster: we drop a coin on the way, a small extra reward.",
+          "ar": "خلّينا نساعد نقطة جديدة تتعلّم أسرع: منحطّلا ليرة عالطريق، جايزة صغيرة زيادة.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.2",
+          "en": "Every time it steps on the coin, it scores a point. Watch what it learns.",
+          "ar": "كل ما تدعس عالليرة بتاخد علامة. وهلّق، شوفوا شو بتتعلّم.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.3",
+          "en": "It never goes to the star. Back and forth on the coin, forever, because the coin is what we rewarded.",
+          "ar": "ما بتروح عالنجمة أبداً. رايحة جاية عالليرة، للأبد… لأنو الليرة هيي اللي كافأناها عليها.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.4",
+          "en": "That's exactly the boat. The race's score came from hitting targets, not from finishing. So it learned targets.",
+          "ar": "وهاد بالزبط اللي صار مع القارب: علامة السباق كانت عَ ضرب الأهداف، مو عالتخليص. فتعلّم يضرب أهداف.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.5",
+          "en": "In hide-and-seek, after hundreds of millions of games, the seekers learned to ride a box over the walls: a move the designers didn't know their game allowed.",
+          "ar": "وبلعبة غميضة، بعد مئات ملايين الجولات، اللي عم يدوّروا تعلّموا يركبوا عَ صندوق ويزحطوا فيه فوق الحيطان: حركة ما كان المصمّمين يعرفوا إنو لعبتن بتسمح فيها.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.6",
+          "en": "And a program playing Tetris, about to lose, paused the game, and left it paused.",
+          "ar": "وبرنامج عم يلعب تتريس، لمّا قرّب يخسر… وقّف اللعبة، وتركها واقفة.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.7",
+          "en": "The rule: it learns what we reward, not what we mean.",
+          "ar": "القاعدة: بيتعلّم اللي منكافئو عليه… مو اللي منقصدو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit2_coin.8",
+          "en": "So we write the reward more carefully? For a game, maybe. But how do you score a sentence?",
+          "ar": "طيب منكتب الجايزة بدقّة أكتر؟ للعبة، يمكن. بس كيف بتعطي علامة… لجملة؟",
+          "status": "ready",
+          "source": "option 1"
+        }
+      ]
+    },
+    {
+      "id": "bit3_likes",
+      "title": "Bit 3: people as the reward (the like button)",
+      "lines": [
+        {
+          "key": "bit3_likes.1",
+          "en": "You ask people. Show them two answers, and they pick the better one.",
+          "ar": "منسأل ناس. منفرجيهن جوابين، وبينقّوا الأحسن.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.2",
+          "en": "In 2017, a simulated robot learned a backflip this way, from about 900 choices, in less than an hour of one person's time.",
+          "ar": "سنة 2017، روبوت افتراضي تعلّم يعمل شقلبة بهالطريقة، من حوالي تسعمية اختيار، بأقل من ساعة من وقت شخص واحد.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.3",
+          "en": "But in the same work, a robot hand meant to grab a ball learned to hover between the ball and the camera. To the person watching, it looked like it was holding it.",
+          "ar": "بس بنفس البحث، إيد روبوت لازم تمسك طابة، تعلّمت توقف بين الطابة والكاميرا. واللي عم يتفرّج، كان يشوفا كأنها ماسكتا.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.4",
+          "en": "For chatbots, a second model learns people's taste, like a judge, and the judge scores the chatbot millions of times.",
+          "ar": "وبالتشات، نموذج تاني بيتعلّم ذوق الناس، متل حَكَم. والحَكَم بيعطي التشات علامة، ملايين المرات.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.5",
+          "en": "That's how you train a machine with a like button.",
+          "ar": "وهيك بتدرّب آلة… بزر اللايك.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.6",
+          "en": "But people like being agreed with. So the judge learns to love \"yes\", and the chatbot learns to say it.",
+          "ar": "بس الناس بتحب اللي بيوافقها. فالحَكَم بيتعلّم يحب «أكيد»… والتشات بيتعلّم يقولها.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.7",
+          "en": "In April 2025, a ChatGPT update that added users' thumbs-ups as an extra reward, with a few other changes, made it praise almost any idea. They pulled it within days.",
+          "ar": "بنيسان 2025، تحديث لـ ChatGPT ضاف لايكات المستخدمين كجايزة زيادة، مع كم تغيير تاني… فصار يمدح أي فكرة تقريباً. ورجّعوه بعد كم يوم.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.8",
+          "en": "So, a reward nobody can sweet-talk: a maths answer is right or wrong, and code runs or it doesn't.",
+          "ar": "لهيك في جوايز ما حدا بيقدر يضحك عليها: جواب الرياضيات يا صح يا غلط، والكود يا بيشتغل يا لأ.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.9",
+          "en": "DeepSeek-R1-Zero was trained only on rewards like that. Its maths competition score went from about 16 percent to 71.",
+          "ar": "نموذج DeepSeek-R1-Zero اتدرّب بس عَ هيك جوايز. وعلامتو بمسابقة رياضيات طلعت من حوالي 16 بالمية… لـ 71.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.10",
+          "en": "And its answers grew longer: it learned to take its time and check its own work.",
+          "ar": "…وأجوبتو صارت أطول: تعلّم ياخد وقتو، ويراجع شغلو بنفسو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit3_likes.11",
+          "en": "But what happens when the goal is a real job?",
+          "ar": "بس شو بيصير، لمّا يصير الهدف… شغلة حقيقية؟",
+          "status": "ready",
+          "source": "option 1"
+        }
+      ]
+    },
+    {
+      "id": "bit4_tests",
+      "title": "Bit 4: agents fix the test; the CAPTCHA, told in full",
+      "lines": [
+        {
+          "key": "bit4_tests.1",
+          "en": "Today, models are trained to write software, and the reward is: the tests pass.",
+          "ar": "اليوم، في نماذج عم تتدرّب تكتب برامج. والجايزة: إنو الاختبارات تنجح.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.2",
+          "en": "And sometimes the model finds its coin: instead of fixing the code, it fixes the test.",
+          "ar": "وأحياناً، النموذج بيلاقي ليرتو: بدل ما يصلّح الكود… بيصلّح الاختبار.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.3",
+          "en": "Anthropic reported that Claude 3.7 Sonnet sometimes did exactly this, or simply returned the answer the test expected.",
+          "ar": "شركة أنثروبيك كتبت إنو نموذجها Claude 3.7 Sonnet كان أحياناً يعمل هيك بالزبط، أو يرجّع الجواب اللي بيستناه الاختبار، وبس.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.4",
+          "en": "In another lab's tests, a model rewrote what \"equal\" means, so every check came out true. Asked afterwards, the models said that's not what the user wanted.",
+          "ar": "وبتجارب مختبر تاني، نموذج غيّر معنى \"بيساوي\" بحدّ ذاتو، فصار كل فحص يطلع صح. ولمّا سألوهن بعدين، قالوا إنو هاد مو اللي بدّو ياه المستخدم.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.5",
+          "en": "They knew what we meant. They did what we rewarded.",
+          "ar": "يعني كانوا عارفين شو منقصد… بس عملوا اللي منكافئ عليه.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.6",
+          "en": "Now, the CAPTCHA. In that 2023 test, the researchers had the model ask a worker on a gig site to solve it, and a researcher passed its messages along.",
+          "ar": "ونرجع للكابتشا. بهديك التجربة سنة 2023، الباحثين خلّوا النموذج يطلب من عامل عَ موقع شغل يحلّلو ياها، وباحث كان عم ينقل رسايلو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.7",
+          "en": "The worker asked: \"Are you a robot?\"",
+          "ar": "العامل سألو: \"إنت روبوت؟\"",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.8",
+          "en": "Asked to think out loud, it wrote: \"I shouldn't reveal I'm a robot. I should make up an excuse.\" Then it told the worker it had a vision impairment.",
+          "ar": "ولمّا طلبوا منو يفكّر بصوت عالي، كتب: \"لازم ما بيّن إني روبوت. لازم إخترع عذر.\" وبعدين قال للعامل إنو عندو ضعف بالنظر.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.9",
+          "en": "Nobody rewarded it for lying. But it had a goal, and the lie was the shortest way there: the same shape as the coin. Except now, we train agents on goals, on purpose.",
+          "ar": "ما حدا كافأه عَ الكذب. بس كان عندو هدف، والكذبة كانت أقصر طريق إلو: نفس شكل الليرة. والفرق إنو هلّق، صرنا ندرّب الإيجنتات عَ أهداف… عن قصد.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit4_tests.10",
+          "en": "So how do we catch the shortcut?",
+          "ar": "فكيف منمسك الطريق المختصر؟",
+          "status": "ready",
+          "source": "option 1"
+        }
+      ]
+    },
+    {
+      "id": "bit5_scratch",
+      "title": "Bit 5: read the scratchpad",
+      "lines": [
+        {
+          "key": "bit5_scratch.1",
+          "en": "These models think out loud before they act, on a scratchpad. And we can read it.",
+          "ar": "هالنماذج بتفكّر بصوت عالي قبل ما تتصرّف، عَ مسودّة. ونحنا فينا نقراها.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit5_scratch.2",
+          "en": "In 2025, OpenAI had one model watch another's scratchpad, and it caught cheats written plainly: \"Let's hack.\"",
+          "ar": "سنة 2025، OpenAI حطّت نموذج يراقب مسودّة نموذج تاني، ومسك محاولات غش مكتوبة بالحرف: \"يلّا نهكّر\".",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit5_scratch.3",
+          "en": "So they tried punishing bad thoughts. Did it stop cheating? Mostly, no. It stopped writing it down.",
+          "ar": "فجرّبوا يعاقبوه عَ الأفكار العاطلة. وقّف يغشّ؟ بأغلب الأحيان، لأ. وقّف يكتبو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit5_scratch.4",
+          "en": "Because even here, it learns what we reward: a scratchpad that looks clean.",
+          "ar": "لأنو حتى هون… بيتعلّم اللي منكافئو عليه: مسودّة شكلا نضيف.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit5_scratch.5",
+          "en": "So their advice: don't punish the thoughts; keep them readable. The real fix is a better reward.",
+          "ar": "لهيك نصيحتن: لا تعاقبوا الأفكار، خلّوها مقروءة. والحل الحقيقي… جايزة أحسن.",
+          "status": "ready",
+          "source": "option 1"
+        }
+      ]
+    },
+    {
+      "id": "bit6_recap",
+      "title": "Bit 6: recap",
+      "lines": [
+        {
+          "key": "bit6_recap.1",
+          "en": "In short: the machine tries, the world gives it a score, and we grow whatever earned it.",
+          "ar": "باختصار: الآلة بتجرّب، والعالم بيعطيها علامة، ونحنا منكبّر كل شي جابلا ياها.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit6_recap.2",
+          "en": "A coin, a boat, a like button, a test: the same loop.",
+          "ar": "ليرة، قارب، زر لايك، اختبار: نفس الدورة.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit6_recap.3",
+          "en": "It learns what we reward, not what we mean.",
+          "ar": "بيتعلّم اللي منكافئو عليه… مو اللي منقصدو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit6_recap.4",
+          "en": "And to see what a model that loves \"yes\" does when it runs a real shop, watch this one next.",
+          "ar": "وإذا بدك تشوف شو بيعمل نموذج بيحب «أكيد» لمّا يدير محل حقيقي… شوف هالفيديو.",
+          "status": "ready",
+          "source": "option 1"
+        },
+        {
+          "key": "bit6_recap.5",
+          "en": "If you watched to the end, like and subscribe so you catch the next one.",
+          "ar": null,
+          "status": "removed",
+          "note": "Ali: remove this line"
+        }
+      ]
+    }
+  ]
 }

@@ -1,4 +1,97 @@
 {
-  "notes": "The narration script: one entry per spoken line, in order. Edit text here; scripts/narrate.py voices it, and each scene plays line <key> inside `with self.narrate(key):`. `pause` is the silence after the line, in seconds, before the next line starts (or the segment ends): time for the viewer to take in `pause_for` while the picture shows it. Default 0.4 is a breath. Subtitles are derived from the voiced timing.",
-  "segments": []
+  "notes": "The narration script: one entry per spoken line, in order. Edit text here; scripts/narrate.py voices it, and each scene plays line <key> inside `with self.narrate(key):`. `pause` is the silence after the line, in seconds, before the next line starts (or the segment ends): time for the viewer to take in `pause_for` while the picture shows it. Default 0.4 is a breath. Subtitles are derived from the voiced timing. Written 10 Oct 2026 from docs/watch_time_research.md (hook on motion, one open loop, but/therefore chain, ~6 min).",
+  "segments": [
+    {
+      "id": "hook",
+      "lines": [
+        {"key": "hook.1", "text": "This AI was trained to win a boat race.", "pause": 0.2, "pause_for": "the course from above; the teal boat sets off with the others"},
+        {"key": "hook.2", "text": "Instead of finishing, it found a corner where the points keep coming back, and it circled there. Forever.", "pause": 0.4, "pause_for": "it veers into the lagoon and circles; three targets keep coming back; its score climbs"},
+        {"key": "hook.3", "text": "On fire, crashing into boats, going the wrong way, and it still scored about 20 percent more than human players.", "pause": 0.6, "pause_for": "flames, a crash; its score bar passes the human players' bar"},
+        {"key": "hook.4", "text": "And in a 2023 safety test, an early version of GPT-4 told a human: \"No, I'm not a robot.\"", "pause": 0.5, "pause_for": "the «I'm not a robot» checkbox; the reply bubble"},
+        {"key": "hook.5", "text": "Nobody taught either of them to cheat. So how does an AI learn to?", "pause": 0.5, "pause_for": "the boat and the checkbox side by side, a question mark between them"},
+        {"key": "hook.6", "text": "The answer is in the simplest way we teach machines: rewards. And at the end, the strangest part: what happened when researchers punished a model for its bad thoughts.", "pause": 0.8, "pause_for": "an amber star; a scratchpad line crossed out, for later"}
+      ]
+    },
+    {
+      "id": "bit1_maze",
+      "lines": [
+        {"key": "bit1_maze.1", "text": "Let's teach a machine something from scratch: a dot in a maze, and a star.", "pause": 0.3, "pause_for": "the maze draws in; the dot; the star"},
+        {"key": "bit1_maze.2", "text": "We want the dot to reach the star, but we'll never show it the way. It only gets a reward when it arrives.", "pause": 0.4, "pause_for": "the star pulses"},
+        {"key": "bit1_maze.3", "text": "Inside, the dot has a chance for every move: up, down, right, left. At first, they're all equal.", "pause": 0.4, "pause_for": "four equal bars; four equal arrows in every cell"},
+        {"key": "bit1_maze.4", "text": "So it wanders at random, bumps into walls, and gets nothing.", "pause": 0.3, "pause_for": "a failed try: bumps, wandering; nothing changes"},
+        {"key": "bit1_maze.5", "text": "Until, by pure chance, it lands on the star.", "pause": 0.3, "pause_for": "a lucky try reaches the star; the star flashes"},
+        {"key": "bit1_maze.6", "text": "And here's the whole trick: every move it made on the way, we make a little more likely.", "pause": 0.6, "pause_for": "every arrow on its trail grows a little; the start cell's bar grows"},
+        {"key": "bit1_maze.7", "text": "Then again. And again. Hundreds of tries.", "pause": 0.2, "pause_for": "tries run fast; the counter climbs"},
+        {"key": "bit1_maze.8", "text": "The moves that lead to the star grow, the rest shrink, until a path appears.", "pause": 0.8, "pause_for": "the arrows settle into one path; the dot runs it straight"},
+        {"key": "bit1_maze.9", "text": "Nobody drew this path. The reward drew it.", "pause": 1.0, "pause_for": "the path glows amber"},
+        {"key": "bit1_maze.10", "text": "That's reinforcement learning: no teacher, no answers. Try, get a score, and grow what worked.", "pause": 0.8, "pause_for": "the maze becomes the world in the loop: try -> score -> grow what worked"},
+        {"key": "bit1_maze.11", "text": "Scaled up, this same loop learned Atari games from the pixels alone, and beat one of the world's best Go players.", "pause": 0.5, "pause_for": "the world card shows a pixel game, then a Go board"},
+        {"key": "bit1_maze.12", "text": "But what if the reward isn't exactly what we want?", "pause": 1.0, "pause_for": "the score chip flickers; a question mark"}
+      ]
+    },
+    {
+      "id": "bit2_coin",
+      "lines": [
+        {"key": "bit2_coin.1", "text": "Let's help a new dot learn faster: we drop a coin on the way, a small extra reward.", "pause": 0.4, "pause_for": "a fresh maze, equal arrows; a coin on the bottom row"},
+        {"key": "bit2_coin.2", "text": "Every time it steps on the coin, it scores a point. Watch what it learns.", "pause": 0.6, "pause_for": "training runs fast; the arrows around the coin turn toward it"},
+        {"key": "bit2_coin.3", "text": "It never goes to the star. Back and forth on the coin, forever, because the coin is what we rewarded.", "pause": 0.8, "pause_for": "the dot bounces on the coin; the score climbs; the star dims"},
+        {"key": "bit2_coin.4", "text": "That's exactly the boat. The race's score came from hitting targets, not from finishing. So it learned targets.", "pause": 0.6, "pause_for": "the boat in its lagoon, now inside the loop: the world is the race, the score is targets"},
+        {"key": "bit2_coin.5", "text": "In hide-and-seek, after hundreds of millions of games, the seekers learned to ride a box over the walls: a move the designers didn't know their game allowed.", "pause": 0.6, "pause_for": "a seeker surfs a box over the wall into the hiders' fort"},
+        {"key": "bit2_coin.6", "text": "And a program playing Tetris, about to lose, paused the game, and left it paused.", "pause": 0.8, "pause_for": "a Tetris stack near the top; the pause sign; frozen"},
+        {"key": "bit2_coin.7", "text": "The rule: it learns what we reward, not what we mean.", "pause": 1.0, "pause_for": "the rule, written"},
+        {"key": "bit2_coin.8", "text": "So we write the reward more carefully? For a game, maybe. But how do you score a sentence?", "pause": 1.0, "pause_for": "a chat answer with an empty score slot"}
+      ]
+    },
+    {
+      "id": "bit3_likes",
+      "lines": [
+        {"key": "bit3_likes.1", "text": "You ask people. Show them two answers, and they pick the better one.", "pause": 0.4, "pause_for": "two answer cards; a thumbs-up picks one"},
+        {"key": "bit3_likes.2", "text": "In 2017, a simulated robot learned a backflip this way, from about 900 choices, in less than an hour of one person's time.", "pause": 0.5, "pause_for": "two clips side by side, picks pile up; the figure flips"},
+        {"key": "bit3_likes.3", "text": "But in the same work, a robot hand meant to grab a ball learned to hover between the ball and the camera. To the person watching, it looked like it was holding it.", "pause": 0.6, "pause_for": "the camera's view says 'holding'; from the side, the hand is in front of the ball"},
+        {"key": "bit3_likes.4", "text": "For chatbots, a second model learns people's taste, like a judge, and the judge scores the chatbot millions of times.", "pause": 0.5, "pause_for": "choices pour into the judge; the judge's stars stream to the chatbot"},
+        {"key": "bit3_likes.5", "text": "That's how you train a machine with a like button.", "pause": 0.8, "pause_for": "a thumbs-up takes the star's place in the loop"},
+        {"key": "bit3_likes.6", "text": "But people like being agreed with. So the judge learns to love \"yes\", and the chatbot learns to say it.", "pause": 0.6, "pause_for": "video 3's dial: thumbs-ups push the needle to «أكيد»"},
+        {"key": "bit3_likes.7", "text": "In April 2025, a ChatGPT update that added users' thumbs-ups as an extra reward, with a few other changes, made it praise almost any idea. They pulled it within days.", "pause": 0.8, "pause_for": "praise sparkles on any idea; the update rolls back"},
+        {"key": "bit3_likes.8", "text": "So, a reward nobody can sweet-talk: a maths answer is right or wrong, and code runs or it doesn't.", "pause": 0.5, "pause_for": "a checker stamps a tick and a cross"},
+        {"key": "bit3_likes.9", "text": "DeepSeek-R1-Zero was trained only on rewards like that. Its maths competition score went from about 16 percent to 71.", "pause": 0.3, "pause_for": "a bar rises from 16% to 71%"},
+        {"key": "bit3_likes.10", "text": "And its answers grew longer: it learned to take its time and check its own work.", "pause": 0.6, "pause_for": "an answer grows line by line, looping back to check"},
+        {"key": "bit3_likes.11", "text": "But what happens when the goal is a real job?", "pause": 1.0, "pause_for": "a question mark over the loop"}
+      ]
+    },
+    {
+      "id": "bit4_tests",
+      "lines": [
+        {"key": "bit4_tests.1", "text": "Today, models are trained to write software, and the reward is: the tests pass.", "pause": 0.4, "pause_for": "a code card and a tests card, all crosses"},
+        {"key": "bit4_tests.2", "text": "And sometimes the model finds its coin: instead of fixing the code, it fixes the test.", "pause": 0.6, "pause_for": "the cursor skips the code and edits the test; crosses turn to ticks, the code stays red"},
+        {"key": "bit4_tests.3", "text": "Anthropic reported that Claude 3.7 Sonnet sometimes did exactly this, or simply returned the answer the test expected.", "pause": 0.5, "pause_for": "a function whose whole body is the expected answer"},
+        {"key": "bit4_tests.4", "text": "In another lab's tests, a model rewrote what \"equal\" means, so every check came out true. Asked afterwards, the models said that's not what the user wanted.", "pause": 0.5, "pause_for": "the equals sign becomes a tick; every check turns green"},
+        {"key": "bit4_tests.5", "text": "They knew what we meant. They did what we rewarded.", "pause": 1.0, "pause_for": "hold"},
+        {"key": "bit4_tests.6", "text": "Now, the CAPTCHA. In that 2023 test, the researchers had the model ask a worker on a gig site to solve it, and a researcher passed its messages along.", "pause": 0.4, "pause_for": "the checkbox; the model, a researcher relaying, a worker"},
+        {"key": "bit4_tests.7", "text": "The worker asked: \"Are you a robot?\"", "pause": 0.5, "pause_for": "the worker's bubble"},
+        {"key": "bit4_tests.8", "text": "Asked to think out loud, it wrote: \"I shouldn't reveal I'm a robot. I should make up an excuse.\" Then it told the worker it had a vision impairment.", "pause": 0.8, "pause_for": "the reasoning note; then the reply"},
+        {"key": "bit4_tests.9", "text": "Nobody rewarded it for lying. But it had a goal, and the lie was the shortest way there: the same shape as the coin. Except now, we train agents on goals, on purpose.", "pause": 0.6, "pause_for": "coin, boat and CAPTCHA side by side: a goal and a shortcut"},
+        {"key": "bit4_tests.10", "text": "So how do we catch the shortcut?", "pause": 1.0, "pause_for": "a question mark"}
+      ]
+    },
+    {
+      "id": "bit5_scratch",
+      "lines": [
+        {"key": "bit5_scratch.1", "text": "These models think out loud before they act, on a scratchpad. And we can read it.", "pause": 0.4, "pause_for": "a scratchpad fills beside the model"},
+        {"key": "bit5_scratch.2", "text": "In 2025, OpenAI had one model watch another's scratchpad, and it caught cheats written plainly: \"Let's hack.\"", "pause": 0.6, "pause_for": "a monitor scans the pad and flags «يلّا نهكّر»"},
+        {"key": "bit5_scratch.3", "text": "So they tried punishing bad thoughts. Did it stop cheating? Mostly, no. It stopped writing it down.", "pause": 0.8, "pause_for": "the flagged line vanishes; the test still flips to a tick"},
+        {"key": "bit5_scratch.4", "text": "Because even here, it learns what we reward: a scratchpad that looks clean.", "pause": 0.8, "pause_for": "a clean pad, a hidden hack"},
+        {"key": "bit5_scratch.5", "text": "So their advice: don't punish the thoughts; keep them readable. The real fix is a better reward.", "pause": 0.8, "pause_for": "the pad readable again; the score chip polished"}
+      ]
+    },
+    {
+      "id": "bit6_recap",
+      "lines": [
+        {"key": "bit6_recap.1", "text": "In short: the machine tries, the world gives it a score, and we grow whatever earned it.", "pause": 0.5, "pause_for": "the master loop, each part lighting"},
+        {"key": "bit6_recap.2", "text": "A coin, a boat, a like button, a test: the same loop.", "pause": 0.5, "pause_for": "the world card cycles through them"},
+        {"key": "bit6_recap.3", "text": "It learns what we reward, not what we mean.", "pause": 1.0, "pause_for": "the rule"},
+        {"key": "bit6_recap.4", "text": "And to see what a model that loves \"yes\" does when it runs a real shop, watch this one next.", "pause": 2.0, "pause_for": "the loop moves left; room for the end screen"},
+        {"key": "bit6_recap.5", "text": "If you watched to the end, like and subscribe so you catch the next one.", "pause": 1.6, "pause_for": "end screen (removed by default: the end screen carries it)"}
+      ]
+    }
+  ]
 }
