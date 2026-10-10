@@ -55,7 +55,7 @@ Ali asked for the research, script, code and final video in one go, so the usual
 | 6 | `bit5_scratch` | `Bit5Scratch` | Read the scratchpad; a watcher flags "Let's hack"; punished, it hides; better rewards | 5 |
 | 7 | `bit6_recap` | `Bit6Recap` | The loop and its four worlds; the rule; end screen space (video 3 + subscribe) | 4 (+1 removed) |
 
-Length: set by the voice. With the placeholder voice the cut is about 6 minutes; the chain between the bits is "but / therefore" (`watch_time_research.md` §2.4).
+Length: set by the voice. With the placeholder voice the cut runs 7:05 (target 6:00, see `START_HERE.md`, "Length"); the chain between the bits is "but / therefore" (`watch_time_research.md` §2.4).
 
 ---
 

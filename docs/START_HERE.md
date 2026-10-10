@@ -1,46 +1,58 @@
-# Start here (video 4, ai-rl-explainer): state on 9 Oct 2026
+# Start here (video 4, ai-rl-explainer): state on 10 Oct 2026
 
-One page for a fresh session. **Planning and research are done; nothing is built.** Don't draft or build further without Ali's go (on 9 Oct he said "not yet"; he had stalled on this video after video 3's slow start and wants to restart with momentum).
+One page for a fresh session. **On 10 Oct Ali asked for the whole video end to end** ("do your research for what would maximize watch hours … write the script and the code, and get the final video with the lines"), so it was built: research, script, scenes, a placeholder Arabic voice and the cut. **What's left is Ali's:** review, re-decide any line, record his voice, publish.
 
 ## Where things stand
 
-- **Topic:** how AI is trained with rewards (reinforcement learning), told through "who taught it to lie?" (the GPT-4 CAPTCHA test). Video 3 promised exactly this: «كيف بتدرّب آلة بزر اللايك؟».
-- **Agreed (1 Oct):** the six-beat structure in `rl_plan.md` §3, ~6 minutes, story ≤ 25%, one master diagram (the RL loop with probability bars).
-- **Done on 9 Oct, without Ali:** the channel's data (`channel_data.md`), packaging rules and method (`packaging_rules.md`), checked facts with sources and wording (`rl_research.md`), the hand-over from video 3 (`video3_handoff.md`), and a sheet of every thumbnail tried (`img/packaging_history.png`).
-- **Not done:** packaging isn't locked; no beat sheet, no English lines, no Arabic, no scenes; the tooling here is older than video 3's.
+- **Topic:** how AI is trained with rewards (reinforcement learning), and why that makes it cheat: «كيف الذكاء الاصطناعي بيتعلّم يغشّ؟». It answers video 3's closing question («كيف بتدرّب آلة بزر اللايك؟») word for word in bit 3.
+- **Research (10 Oct):** what maximizes watch hours, with sources and the decisions it drove: [`watch_time_research.md`](watch_time_research.md). Headline: average view duration has stayed ~70 s whatever the length, so the first minute decides; the video opens on motion, keeps one open loop, chains the bits by "but / therefore", ends on content.
+- **Facts (re-checked 10 Oct):** [`rl_research.md`](rl_research.md). Corrected: DeepSeek **R1-Zero** (not R1), the CAPTCHA model was pre-release and the researchers suggested the gig site, 3.7 Sonnet's card documents editing tests, the robot hand is back.
+- **Script:** 56 lines in Syrian Arabic, each with two options, ★ decided by Claude: [`arabic_script.md`](arabic_script.md); the English and the pauses: `config/narration.json`; line ↔ picture: [`script_visual_map.md`](script_visual_map.md).
+- **Scenes:** seven, in `our_scenes/` (`hook_boat.py` … `bit6_recap.py`) on `rl_kit.py`. The maze and the coin are real REINFORCE runs, seeded.
+- **The cut:** rendered with a **placeholder** Arabic voice (offline XTTS, a Damascene voice from the Arabic Speech Corpus) so the timing and the review are real: **7:05**, 1080p, in `media/output/` (`full_cut_ar.mp4`, the upload shape; `full_cut_ar_subtitled.mp4`, the same with the lines burned in, was sent in the chat because `media/` isn't committed). **Never publish with it**: re-record (below) and rebuild.
+- **Packaging:** title, thumbnails A/B/C, description, tags, pinned comment, schedule and upload checklist: [`youtube/publish_pack.md`](youtube/publish_pack.md).
 
-## Read in this order (about 20 minutes)
+## What Ali does next
 
-1. `README.md`, this file
-2. `rl_plan.md`: structure, guardrails, the packaging warning
-3. `channel_data.md`: what the three videos' numbers say, and what is unknown
-4. `video3_handoff.md`: the promise to pay off, vocabulary, workflow, tooling drift
-5. `rl_research.md`: checked facts, how to say them, what was dropped
-6. `packaging_rules.md`
-7. `instructions.md`: the process (its voice-pipeline section predates video 3's Decide mode; see the hand-over)
+1. **Watch the review cut** (sent in the chat; rebuilt by the commands below) and mark changes per row in `script_visual_map.md`, or just say them.
+2. **Re-decide lines** in the recorder's Decide mode (`python3 scripts/record_server.py`, http://localhost:8765); every line is ★ now.
+3. **Record** in Record mode, then `scripts/enhance_takes.py` → `scripts/process_takes.py`.
+4. **Rebuild with his voice** (the scenes re-time themselves):
 
-## First steps when Ali says go
+   ```bash
+   VO_LANG=ar MANIM_HD=1 .venv/bin/python scripts/render_segments.py --force
+   .venv/bin/python scripts/narrate.py track --lang ar
+   .venv/bin/python scripts/mux_audio.py --force
+   .venv/bin/python scripts/build_srt_cut.py --cues config/cues_ar_vo.json --out media/output/full_cut_ar.mp4 \
+       --no-subs --lang ar --music "media/music/No.10 _A New Beginning - Esther Abrami.mp3" --music-lufs -38 --caption-band 0.20
+   .venv/bin/python scripts/srt_en.py --voice ar
+   .venv/bin/python scripts/chapters.py --write   # chapters into description.txt; prints the length and the card time
+   ```
 
-1. **Ask for fresh numbers:** video 3's day-7 read (Mon 12 Oct) and video 2's; update `channel_data.md` §1 and §8.
-2. **Sync the tooling** from video 3 (`video3_handoff.md` §4; one command), install or link `manim/` (README).
-3. **Open the primary pages** in `rl_research.md` §6 and tick the claims off (15 minutes; the sandbox this was researched in couldn't reach them).
-4. **Packaging first** (`packaging_rules.md` §4): shelf search, five candidates, pre-test with 10–20 people, check video 2's publish time of day in Studio.
-5. **Then the bit workflow** (`instructions.md`): beat sheet with rough English lines (video 3's `script_visual_map.md` is the model) → Ali approves → English lines + Arabic candidates → Ali decides in the recorder's Decide mode → recording → enhance → process takes → build → upload cut → publish pack.
-6. **Calendar to expect:** video 3 took 4 days from plan to published, and one day for the build itself.
+5. **Open the primary sources** in `rl_research.md` §6 (15 minutes; the sandbox couldn't reach them).
+6. **Publish** with `youtube/publish_pack.md` (checklist, schedule, first-hour share list).
 
-## What Ali still has to decide
+## Length
 
-1. Packaging direction: a title that names the subject and asks the question, no Latin letters, vs story-first; the thumbnail concept (`rl_plan.md` §6, the warning box).
-2. The Arabic word for the topic: «التعلّم المعزّز» or plain language («بالجوايز»).
-3. Which extra beats to add from `rl_research.md` §3 (the backflip from ~900 choices, the Tetris gag, April 2025 sycophancy as the dial's pay-off, `sys.exit(0)`, inoculation prompting).
-4. Whether to open on video 3's dial (the thumbs-ups pushing «أكيد») or straight on the CAPTCHA.
-5. Whether to name OpenAI, DeepMind, Anthropic and METR in the voice-over (video 3 named Anthropic).
-6. The publish slot (video 2's, if Studio shows it) and the first-hour share list.
-7. Length (~6:00 or 5–7) and music (video 2's beds again?).
+The research set **~6:00** (`watch_time_research.md` §2, decision 6); the placeholder cut runs **7:05**. Speech is 379 s of it at about 11 characters a second (XTTS sped up 1.1×), plus 37 s of planned pauses and the 9 s end-screen hold. The maze arrives at 0:44, later than the ~0:30 of decision 3, and not only because of the pace: the hook's six lines (472 characters as written, more with the numbers said in words) take ~40 s with their pauses even at a brisk 13 characters a second. To bring the maze earlier, shorten `hook.3` first («وبيخبط بالقوارب، وماشي بالعكس»), not the title question or the open loop. Ali's pace decides the rest: `scripts/chapters.py` prints the length after his rebuild. If it still runs past ~6:30, the side examples are the first to trim, each a line plus its picture in the scene: hide-and-seek (`bit2_coin.5`, the longest line), the backflip and the robot hand (`bit3_likes.2`–`.3`), April 2025 (`bit3_likes.7`). The chain (boat → maze → coin → likes → checkers → tests → CAPTCHA → scratchpad) stays whole.
+
+## Rebuilding the placeholder cut (what was done on 10 Oct)
+
+```bash
+python3 scripts/voice_ar_tts.py --export lines.json          # spoken forms of the ready lines
+<XTTS venv>/bin/python xtts_batch.py lines.json raw/         # the offline voice, one batch (see voice_ar_tts.py)
+python3 scripts/voice_ar_tts.py --from-dir raw/ --voice xtts-asc --tempo 1.1   # XTTS reads slowly; 1.1x, same pitch
+python3 scripts/voice_ar_tts.py --from-dir raw/ --voice xtts-asc --tempo 1.0 --key hook.4 --force   # «مو روبوت» blurs at 1.1x
+VO_LANG=ar_tts MANIM_HD=1 .venv/bin/python scripts/render_segments.py --force
+.venv/bin/python scripts/narrate.py track --lang ar_tts
+.venv/bin/python scripts/mux_audio.py --force   # then build_srt_cut.py as above, and srt_en.py --voice ar_tts
+```
+
+The XTTS setup lived in the cloud session's scratchpad (models from public git repos); on a Mac, any offline Arabic TTS that writes a WAV works through `voice_ar_tts.py --cmd`.
 
 ## Don't
 
-- Don't use facts marked dropped in `rl_research.md` §4, or present the CAPTCHA as autonomous (a researcher relayed the messages).
-- Don't write Al-Da7ee7-style packaging; the diagrams are the video.
+- Don't publish with the placeholder voice, or tick "altered or synthetic content: no" unless the voice is Ali's.
+- Don't use facts marked dropped in `rl_research.md` §4, or present the CAPTCHA as autonomous (the researchers suggested the site and relayed the messages).
 - Don't edit video 3's title, thumbnail or description before Mon 19 Oct (its own notes explain why).
-- Don't build a scene before Ali approves the visual plan for it.
+- Reads still due: video 3 day 7 (Mon 12 Oct) and day 14 (Mon 19 Oct) into `channel_data.md` §8.

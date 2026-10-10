@@ -1,0 +1,49 @@
+كيف الذكاء الاصطناعي بيتعلّم يغشّ؟ شرح بالرسم لطريقة تدريب الذكاء الاصطناعي بالجوايز (التعلّم المعزّز، Reinforcement Learning): الآلة بتتعلّم الشي اللي منكافئها عليه، مو الشي اللي منقصدو.
+
+من قارب ربح سباق بدون ما يخلّصو، لنسخة أولية من GPT-4 قالت لإنسان «لأ، أنا مو روبوت»: شرح بالعربي، بدون معادلات، كيف بتتعلّم الآلة من علامة، وليش هالعلامة بتصير طريق للغش.
+
+بالفيديو منمرّ على:
+• متاهة ونقطة: كيف الجايزة بترسم الطريق (تدريب حقيقي صغير، مو رسمة)
+• ليرة عالطريق: جايزة زيادة بتخرّب كل شي، ومتلها القارب والغميضة وتتريس
+• زر اللايك: كيف بيتدرّب التشات من اختيارات الناس، وليش بيصير يقول «أكيد»
+• جوايز ما حدا بيقدر يضحك عليها: الرياضيات والكود
+• الإيجنتات اللي بتصلّح الاختبار بدل الكود، وقصة الكابتشا كاملة
+• المسودّة: شو صار لما الباحثين عاقبوا النموذج عَ أفكارو
+
+reinforcement learning · reward hacking · specification gaming · RLHF · reward model · sycophancy · chain of thought · CAPTCHA
+
+{CHAPTERS}
+
+ملاحظات دقّة: تجربة الكابتشا كانت اختبار أمان على نسخة GPT-4 قبل إصدارها، والباحثين هنّي اللي اقترحوا موقع العمّال (TaskRabbit)، وكان في باحث عم ينقل الرسايل. المتاهة والليرة بالفيديو تدريب حقيقي صغير (REINFORCE)، مو رسمة. أرقام DeepSeek هي لـ R1-Zero (المسابقة: AIME 2024).
+
+للاستزادة:
+OpenAI — Faulty Reward Functions in the Wild (2016)
+https://openai.com/index/faulty-reward-functions/
+OpenAI — GPT-4 System Card (2023), ARC section
+https://cdn.openai.com/papers/gpt-4-system-card.pdf
+ARC Evals — Update on recent evals (2023)
+https://evals.alignment.org/blog/2023-03-18-update-on-recent-evals/
+Mnih et al. — Playing Atari with Deep Reinforcement Learning (2013)
+https://arxiv.org/abs/1312.5602
+OpenAI — Emergent Tool Use From Multi-Agent Interaction (2019)
+https://openai.com/index/emergent-tool-use/
+Tom Murphy VII — The First Level of Super Mario Bros. is Easy with Lexicographic Orderings and Time Travel (SIGBOVIK 2013)
+https://tom7.org/mario/mario.pdf
+OpenAI — Learning from Human Preferences (2017)
+https://openai.com/index/learning-from-human-preferences/
+OpenAI — Expanding on what we missed with sycophancy (2025)
+https://openai.com/index/expanding-on-sycophancy/
+DeepSeek-AI — DeepSeek-R1 (2025)
+https://arxiv.org/abs/2501.12948
+Anthropic — Claude 3.7 Sonnet System Card (2025)
+https://www.anthropic.com/claude-3-7-sonnet-system-card
+METR — Recent Frontier Models Are Reward Hacking (2025)
+https://metr.org/blog/2025-06-05-recent-reward-hacking/
+OpenAI — Detecting misbehavior in frontier reasoning models (2025)
+https://openai.com/index/chain-of-thought-monitoring/
+
+الفيديو السابق: كيف ايجنت ذكاء اصطناعي يدير محل؟
+https://www.youtube.com/watch?v=HygDWiw5PS0
+
+موسيقى:
+Esther Abrami — No.10 A New Beginning

@@ -46,7 +46,7 @@ The scenes re-time themselves to your recorded voice, so an Arabic line can run 
 
 - **Names in the voice-over:** GPT-4, OpenAI, ChatGPT, DeepSeek-R1-Zero, Anthropic, Claude 3.7 Sonnet. METR is "another lab".
 - **On-screen words follow the picks** (listed in `script_visual_map.md`).
-- **Length:** at the placeholder pace this is about 6 minutes with the end screen.
+- **Length:** the placeholder cut (XTTS at 1.1×, about 11 characters a second) runs **7:05** with the end screen, against the 6:00 the research set; Ali's own pace sets the final length (`START_HERE.md`, "Length").
 
 
 ---
