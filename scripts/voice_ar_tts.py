@@ -22,6 +22,8 @@ An engine that is slow to load (XTTS: ~2 min per call) is better run in one batc
   python3 scripts/voice_ar_tts.py --export lines.json            # the spoken forms of the lines to voice
   <batch tool> lines.json raw/                                   # writes raw/<key>.wav
   python3 scripts/voice_ar_tts.py --from-dir raw/ --voice xtts   # clean them up and index them
+
+XTTS reads slowly (~10 characters a second at speed 0.9); --tempo 1.1 brings it nearer a speaking pace.
 """
 from __future__ import annotations
 
@@ -77,18 +79,20 @@ def spoken_form(text: str) -> str:
     return s.strip()
 
 
-def read_any_wav(path: Path) -> tuple[np.ndarray, int]:
-    """Mono float audio from a WAV (16-bit or float), resampled by ffmpeg to 48 kHz 16-bit first."""
+def read_any_wav(path: Path, tempo: float = 1.0) -> tuple[np.ndarray, int]:
+    """Mono float audio from a WAV (16-bit or float), resampled by ffmpeg to 48 kHz 16-bit first;
+    tempo > 1 speeds it up without changing the pitch."""
     with tempfile.TemporaryDirectory() as td:
         tmp = Path(td) / "a.wav"
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(path), "-ac", "1", "-ar", "48000",
+        speed = ["-filter:a", f"atempo={tempo}"] if tempo != 1.0 else []
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(path), *speed, "-ac", "1", "-ar", "48000",
                         "-c:a", "pcm_s16le", str(tmp)], check=True)
         return pt.read_wav(tmp)
 
 
-def clean_take(raw: Path, out: Path) -> tuple[float, list]:
+def clean_take(raw: Path, out: Path, tempo: float = 1.0) -> tuple[float, list]:
     """A raw TTS take, cleaned like a recorded one (process_takes.py); returns its length and phrases."""
-    x, sr = read_any_wav(raw)
+    x, sr = read_any_wav(raw, tempo)
     lead = np.zeros(int(0.25 * sr), dtype=np.float32)          # room for the speech detector's edges
     x = np.concatenate([lead, x, lead])
     spans, info = pt.speech_phrases(x, sr)
@@ -97,13 +101,13 @@ def clean_take(raw: Path, out: Path) -> tuple[float, list]:
     return dur, phrases
 
 
-def voice(cmd: list[str], text: str, out: Path) -> tuple[float, list]:
+def voice(cmd: list[str], text: str, out: Path, tempo: float = 1.0) -> tuple[float, list]:
     with tempfile.TemporaryDirectory() as td:
         raw = Path(td) / "raw.wav"
         r = subprocess.run([*cmd, text, str(raw)], capture_output=True, text=True)
         if r.returncode or not raw.is_file():
             raise RuntimeError(f"TTS failed ({r.returncode}): {r.stderr[-400:]}")
-        return clean_take(raw, out)
+        return clean_take(raw, out, tempo)
 
 
 def main() -> None:
@@ -114,6 +118,8 @@ def main() -> None:
     ap.add_argument("--force", action="store_true", help="re-voice even if unchanged")
     ap.add_argument("--export", type=Path, help="write the spoken forms of the lines to voice to this JSON and stop")
     ap.add_argument("--from-dir", type=Path, help="take raw/<key>.wav from this folder instead of running --cmd")
+    ap.add_argument("--tempo", type=float, default=1.0,
+                    help="speed the takes up (or down) without changing the pitch, e.g. 1.1 for a slow engine")
     args = ap.parse_args()
     if not (args.cmd or args.export or args.from_dir):
         sys.exit("No TTS command: pass --cmd, set AR_TTS_CMD, or use --export / --from-dir (see the docstring).")
@@ -130,7 +136,7 @@ def main() -> None:
     voice_id = args.voice or (Path(cmd[-1]).stem if args.cmd else "batch")
     todo = [ln for ln in lines if args.force or not (
         (e := index["lines"].get(ln["key"])) and e.get("text") == ln["ar"] and e.get("voice") == voice_id
-        and (REPO_ROOT / e["file"]).is_file())]
+        and e.get("tempo", 1.0) == args.tempo and (REPO_ROOT / e["file"]).is_file())]
     print(f"{len(lines)} lines, {len(lines) - len(todo)} up to date, {len(todo)} to voice with {voice_id}")
     if args.export:
         args.export.write_text(json.dumps([{"key": ln["key"], "text": spoken_form(ln["ar"])} for ln in todo],
@@ -146,15 +152,15 @@ def main() -> None:
                 raw = args.from_dir / f"{ln['key']}.wav"
                 if not raw.is_file():
                     raise RuntimeError(f"no raw take {raw}")
-                dur, phrases = clean_take(raw, out)
+                dur, phrases = clean_take(raw, out, args.tempo)
             else:
-                dur, phrases = voice(cmd, said, out)
+                dur, phrases = voice(cmd, said, out, args.tempo)
         except (RuntimeError, ValueError, subprocess.CalledProcessError) as e:
             problems.append(f"{ln['key']}: {e}")
             print(f"  [{n}/{len(todo)}] {ln['key']}: FAILED {e}")
             continue
         index["lines"][ln["key"]] = {"file": str(out.relative_to(REPO_ROOT)), "duration": round(dur, 3),
-                                     "text": ln["ar"], "spoken": said, "voice": voice_id,
+                                     "text": ln["ar"], "spoken": said, "voice": voice_id, "tempo": args.tempo,
                                      "phrases": [[round(a, 2), round(b, 2)] for a, b in phrases]}
         tmp = INDEX.with_suffix(".tmp")
         tmp.write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

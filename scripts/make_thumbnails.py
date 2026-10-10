@@ -43,7 +43,7 @@ NEIGHBOURS = [
     (IMG / "v3_c_shopkeeper.png", "كيف ايجنت ذكاء اصطناعي يدير محل؟", "5:54"),
 ]
 CHANNEL = "Ali Salloum - علي سلوم"
-DURATION = "6:05"
+DURATION = "7:05"  # the placeholder cut; set it to the final cut's length
 EXTRA = 160  # headless Chrome's viewport is shorter than --window-size: ask for more, then crop
 
 

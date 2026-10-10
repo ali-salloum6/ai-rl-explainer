@@ -304,10 +304,13 @@ def main() -> None:
         # Review copy: the lines burned into the band the picture already leaves clear at the bottom.
         burned = out.with_name(out.stem + "_subtitled.mp4")
         w, h = size(out)
-        # libass units are PlayRes units (PlayResY 288 for SRT input), scaled to the frame by libass itself
+        # libass units are PlayRes units (PlayResY 288 for SRT input), scaled to the frame by libass itself.
+        # Encoding=-1 makes libass detect the base direction (right to left here); without it a line that
+        # mixes Arabic and Latin ("GPT-4") is laid out left to right and its phrases come out in the wrong order.
         band_units = 288 * args.caption_band
-        style = (f"FontName=Amiri,FontSize={round(band_units * 0.30)},Outline=1.4,Shadow=0,BorderStyle=1,"
-                 f"MarginV={round(band_units * 0.22)},MarginL=30,MarginR=30,Alignment=2,PrimaryColour=&H00F2F1EC")
+        style = (f"FontName=Amiri,FontSize={round(band_units * 0.40)},Outline=1.4,Shadow=0,BorderStyle=1,"
+                 f"MarginV={round(band_units * 0.22)},MarginL=30,MarginR=30,Alignment=2,PrimaryColour=&H00F2F1EC,"
+                 f"Encoding=-1")
         fonts = REPO_ROOT / "assets" / "fonts"
         subprocess.run(
             [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-i", str(out),
