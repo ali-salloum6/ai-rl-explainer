@@ -19,6 +19,8 @@ track — for every segment, read the render's timing log (media/timing/<Scene>.
         by NarratedScene), place each line where the scene started it, and write
         media/audio/<id>-vo-ai.wav (44.1 kHz mono, -16 LUFS, exactly the render's length).
         Also writes config/cues_en_vo.json: subtitles cut from the voiced lines.
+        --lang ar lays down Ali's recorded Arabic, --lang ar_tts the offline Arabic placeholder
+        (scripts/voice_ar_tts.py); both write media/audio/<id>-vo-ar.wav and config/cues_ar_vo.json.
 
 Then: python3 scripts/mux_audio.py && python3 scripts/build_srt_cut.py --cues config/cues_en_vo.json --burn
 """
@@ -46,6 +48,7 @@ AUDIO_MANIFEST = REPO_ROOT / "config" / "audio_manifest.json"
 CUES_VO = REPO_ROOT / "config" / "cues_en_vo.json"
 NARRATION_AR = REPO_ROOT / "config" / "narration_ar.json"
 AR_INDEX = REPO_ROOT / "media" / "audio" / "lines_ar" / "clean" / "index.json"
+AR_TTS_INDEX = REPO_ROOT / "media" / "audio" / "lines_ar" / "tts" / "index.json"   # scripts/voice_ar_tts.py
 VO_LANG = os.environ.get("VO_LANG", "ar")   # which narration `track` lays down (see our_scenes/kit.py)
 LINES_DIR = REPO_ROOT / "media" / "audio" / "lines"
 INDEX = LINES_DIR / "index.json"
@@ -333,8 +336,10 @@ def cmd_track(args) -> None:
     scene_cls = {s["id"]: s["scene"].split(":", 1)[1] for s in load(SCENES)["segments"]}
     videos = {s["id"]: REPO_ROOT / s["video"] for s in load(AUDIO_MANIFEST)["segments"]}
     lang = args.lang
-    idx_path = AR_INDEX if lang == "ar" else INDEX
+    idx_path = {"ar": AR_INDEX, "ar_tts": AR_TTS_INDEX}.get(lang, INDEX)
     index = load(idx_path)["lines"] if idx_path.is_file() else {}
+    if lang == "ar_tts":          # the placeholder voice stands in for Ali's: same files downstream
+        lang = "ar"
     if lang == "ar":
         text_of = {ln["key"]: ln["ar"] for seg in load(NARRATION_AR)["segments"] for ln in seg["lines"]
                    if ln.get("status") == "ready"}
@@ -449,8 +454,9 @@ def main() -> None:
                         "verbatim; a Whisper slip also counts, so a flagged line may be fine)")
     t = sub.add_parser("track", help="lay the voice under the rendered scenes")
     t.add_argument("--segment", action="append", dest="segments", metavar="ID")
-    t.add_argument("--lang", choices=["ar", "en"], default=VO_LANG,
-                   help="narration to lay down: ar = Ali's recorded Arabic (default), en = AI English")
+    t.add_argument("--lang", choices=["ar", "ar_tts", "en"], default=VO_LANG,
+                   help="narration to lay down: ar = Ali's recorded Arabic (default), ar_tts = the offline "
+                        "Arabic placeholder voice (written to the same <id>-vo-ar.wav files), en = AI English")
     args = p.parse_args()
     {"synth": cmd_synth, "track": cmd_track}[args.cmd](args)
 

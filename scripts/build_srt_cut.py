@@ -176,6 +176,9 @@ def main() -> None:
     p.add_argument("--caption-band", type=float, default=0.0,
                    help="keep this fraction of the height clear at the bottom for YouTube's captions "
                         "(the picture shrinks and moves up; 0.18 fits two caption lines)")
+    p.add_argument("--burn-band", action="store_true",
+                   help="also write *_subtitled.mp4: the subtitles burned into the clear caption band (a review copy "
+                        "with the lines on screen; needs --caption-band; Arabic in Amiri)")
     p.add_argument("--dry-run", action="store_true")
     args = p.parse_args()
 
@@ -296,6 +299,24 @@ def main() -> None:
         tmp_path.unlink(missing_ok=True)
         raise
     print(f"Wrote {out.relative_to(REPO_ROOT)}")
+
+    if args.burn_band and args.caption_band > 0:
+        # Review copy: the lines burned into the band the picture already leaves clear at the bottom.
+        burned = out.with_name(out.stem + "_subtitled.mp4")
+        w, h = size(out)
+        # libass units are PlayRes units (PlayResY 288 for SRT input), scaled to the frame by libass itself
+        band_units = 288 * args.caption_band
+        style = (f"FontName=Amiri,FontSize={round(band_units * 0.30)},Outline=1.4,Shadow=0,BorderStyle=1,"
+                 f"MarginV={round(band_units * 0.22)},MarginL=30,MarginR=30,Alignment=2,PrimaryColour=&H00F2F1EC")
+        fonts = REPO_ROOT / "assets" / "fonts"
+        subprocess.run(
+            [FFMPEG, "-y", "-hide_banner", "-loglevel", "error", "-i", str(out),
+             "-vf", f"subtitles={srt_path}:fontsdir={fonts}:force_style='{style}'",
+             "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p", "-c:a", "copy", "-sn",
+             str(burned)],
+            check=True,
+        )
+        print(f"Wrote {burned.relative_to(REPO_ROOT)}  (subtitles in the bottom {args.caption_band:.0%})")
 
     if args.burn:
         # Letterbox the review copy and burn the subtitles into the added band.

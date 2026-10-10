@@ -90,6 +90,8 @@ python3 scripts/mux_audio.py --segment bit1
 
 Register segments in `config/scenes_manifest.json` and `config/audio_manifest.json`. Same frame size for all segments in one assemble run.
 
+**Render segments in order.** Each segment opens on the previous one's exact last frame and dissolves into its own (`continue_from`), so the cuts are seamless; `render_segments.py` saves every render's last frame to `media/frames/` for the next one. After changing a segment, re-render it and the one after it.
+
 ### Visual verification
 
 Render preview → keyframes → **look at PNGs** → fix → repeat. Mux when VO exists.
@@ -124,7 +126,11 @@ with register_font(str(Path(__file__).resolve().parent.parent / "assets/fonts/Am
 
 1. `config/narration.json`: one entry per spoken line (`key`, English text, `pause`). Scenes are `NarratedScene`s and play each line inside `with self.narrate(key):`, so timing follows the voice.
 2. Placeholder voice: `python3 scripts/narrate.py synth` (English AI voice, `VO_LANG=en`), render, then `python3 scripts/narrate.py track` and `python3 scripts/build_srt_cut.py --cues config/cues_en_vo.json --burn` for the review cut.
-3. Arabic: candidates and decisions in `docs/arabic_script.md` → `python3 scripts/build_narration_ar.py` → `config/narration_ar.json`. Instructions that a number can't express ("cut this line") go in its `OVERRIDES` by hand.
-4. Record: `python3 scripts/record_server.py`, open http://localhost:8765 (also in `.claude/launch.json`). Every take is kept.
+3. Arabic: candidates and decisions in `docs/arabic_script.md` → `python3 scripts/build_narration_ar.py` → `config/narration_ar.json`. Ali decides in the recorder's Decide mode (step 4) or by hand after **Decision:**; both write the same file. A decision that reads like an instruction shows as "needs a look" and goes in the builder's `OVERRIDES` by hand.
+4. Decide and record: `python3 scripts/record_server.py`, open http://localhost:8765 (also in `.claude/launch.json`). Decide mode: pick an option, change a few of its letters first, write your own wording, or remove the line. Record mode: one line at a time; every take is kept.
 5. `scripts/enhance_takes.py` (Adobe Enhance Speech, one by one) → `scripts/process_takes.py` (trim, pauses, loudness) → re-render with `VO_LANG=ar` (default) → `narrate.py track` → mux.
 6. Upload cut with the music bed and the bottom band clear for YouTube captions: `build_srt_cut.py --cues config/cues_ar_vo.json --caption-band 0.20` (see its docstring).
+
+**Placeholder Arabic voice (video 4, before Ali records).** `scripts/voice_ar_tts.py` voices every ready line with an offline TTS into `media/audio/lines_ar/tts/` (cleaned like a recorded take, its own index), render with `VO_LANG=ar_tts`, then `narrate.py track --lang ar_tts` writes the same `<id>-vo-ar.wav` files and `cues_ar_vo.json` that Ali's takes will replace. Nothing in his recording path reads or writes the placeholder. It is for timing and review only: never publish with it (the upload checklist declares the voice as Ali's own).
+
+**Headless (cloud) rendering.** ManimGL needs an OpenGL display; `render_segments.py` runs it inside `xvfb-run` when there is no `$DISPLAY`. A one-off render: `xvfb-run -a .venv/bin/manimgl our_scenes/<file>.py <Scene> -w -l --video_dir ./media`. A still: add `-s` *with* `-w` (`-s` alone opens a window and waits).
