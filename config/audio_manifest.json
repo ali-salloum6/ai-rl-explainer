@@ -9,5 +9,62 @@
     "audio_sample_rate": 44100,
     "audio_channels": 1
   },
-  "segments": []
+  "segments": [
+    {
+      "id": "hook",
+      "video": "media/HookBoat.mp4",
+      "output": "hook_with_audio.mp4",
+      "notes": "0:00 hook: the boat that won by never finishing; an early GPT-4 said it wasn't a robot; how does AI learn to cheat? rewards. Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/hook-vo-ar.wav",
+      "strategy": "longest"
+    },
+    {
+      "id": "bit1_maze",
+      "video": "media/Bit1Maze.mp4",
+      "output": "bit1_maze_with_audio.mp4",
+      "notes": "the centrepiece: a real REINFORCE run on a maze; the arrows become a path; the RL loop. Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/bit1_maze-vo-ar.wav",
+      "strategy": "longest"
+    },
+    {
+      "id": "bit2_coin",
+      "video": "media/Bit2Coin.mp4",
+      "output": "bit2_coin_with_audio.mp4",
+      "notes": "a coin gets farmed (a real run); the boat; hide-and-seek; Tetris; the rule. Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/bit2_coin-vo-ar.wav",
+      "strategy": "longest"
+    },
+    {
+      "id": "bit3_likes",
+      "video": "media/Bit3Likes.mp4",
+      "output": "bit3_likes_with_audio.mp4",
+      "notes": "people as the reward: backflip, robot hand, the judge, the like button, video 3's dial, April 2025, R1-Zero. Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/bit3_likes-vo-ar.wav",
+      "strategy": "longest"
+    },
+    {
+      "id": "bit4_tests",
+      "video": "media/Bit4Tests.mp4",
+      "output": "bit4_tests_with_audio.mp4",
+      "notes": "agents fix the test; Claude 3.7 Sonnet, METR; the CAPTCHA told in full; a goal and a shortcut. Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/bit4_tests-vo-ar.wav",
+      "strategy": "longest"
+    },
+    {
+      "id": "bit5_scratch",
+      "video": "media/Bit5Scratch.mp4",
+      "output": "bit5_scratch_with_audio.mp4",
+      "notes": "read the scratchpad; punish it and it hides; a better reward. Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/bit5_scratch-vo-ar.wav",
+      "strategy": "longest"
+    },
+    {
+      "id": "bit6_recap",
+      "video": "media/Bit6Recap.mp4",
+      "output": "bit6_recap_with_audio.mp4",
+      "notes": "recap on the master loop; the rule; end screen space (video 3 + subscribe). Arabic VO: Ali's takes once recorded (process_takes.py), the placeholder voice until then; laid down by scripts/narrate.py track.",
+      "audio": "media/audio/bit6_recap-vo-ar.wav",
+      "strategy": "longest"
+    }
+  ]
 }

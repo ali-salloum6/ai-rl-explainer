@@ -1,9 +1,19 @@
 {
   "output": "media/output/final_with_music.mp4",
   "narration_manifest": "config/audio_manifest.json",
-  "segment_order": [],
+  "segment_order": [
+    "hook",
+    "bit1_maze",
+    "bit2_coin",
+    "bit3_likes",
+    "bit4_tests",
+    "bit5_scratch",
+    "bit6_recap"
+  ],
   "music": {
-    "files": [],
+    "files": [
+      "media/music/No.10 _A New Beginning - Esther Abrami.mp3"
+    ],
     "volume": 0.14,
     "loop": true
   },
@@ -11,5 +21,5 @@
     "audio_codec": "aac",
     "audio_bitrate": "192k"
   },
-  "notes": "Fill segment_order and music.files when the cut exists. Same assembly pattern as ../1-hour-challenge/config/final_assembly.json."
+  "notes": "The upload cut is built with scripts/build_srt_cut.py (music bed, caption band); this file serves assemble_final.py."
 }
