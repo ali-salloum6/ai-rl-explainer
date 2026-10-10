@@ -14,6 +14,7 @@
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink);
     font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
   button, select { font: inherit; color: inherit; }
+  body.decide .rec-only, body.record .decide-only { display: none !important; }
   .app { display: grid; grid-template-columns: 250px 1fr; height: 100%; }
   /* ---- sidebar: every line, with its status ---- */
   aside { border-right: 1px solid var(--line); overflow-y: auto; padding: 12px 0; }
@@ -25,11 +26,13 @@
   .item.cur { background: var(--panel); color: var(--ink); box-shadow: inset 3px 0 0 var(--accent); }
   .dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--ink3); flex: none; }
   .dot.done { background: var(--ok); border-color: var(--ok); }
-  .dot.stale { background: var(--warm); border-color: var(--warm); }
+  .dot.decided { background: var(--accent); border-color: var(--accent); }
+  .dot.stale, .dot.review { background: var(--warm); border-color: var(--warm); }
   .dot.pending { border-style: dashed; opacity: .6; }
+  .dot.removed { border-color: transparent; }
   .item.pending { color: var(--ink3); }
-  .now.pending { color: var(--ink3); font-family: inherit; font-size: 20px; direction: ltr; text-align: left; }
-  .item .n { width: 22px; color: var(--ink3); }
+  .item.removed { color: var(--ink3); text-decoration: line-through; }
+  .item .n { width: 22px; color: var(--ink3); text-decoration: none; }
   /* ---- main ---- */
   main { display: flex; flex-direction: column; min-width: 0; }
   header { display: flex; gap: 14px; align-items: center; padding: 12px 24px; border-bottom: 1px solid var(--line);
@@ -38,10 +41,16 @@
   header .progress { color: var(--ink2); font-variant-numeric: tabular-nums; }
   header .spacer { flex: 1; }
   header label { color: var(--ink2); font-size: 13px; display: flex; gap: 6px; align-items: center; }
+  .modes { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .modes button { background: none; border: 0; padding: 5px 14px; cursor: pointer; color: var(--ink2); }
+  .modes button + button { border-left: 1px solid var(--line); }
+  .modes button.on { background: var(--panel); color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
   select { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; max-width: 260px; }
   .btn { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
   .btn:hover:not(:disabled) { border-color: var(--ink3); }
   .btn:disabled { opacity: .4; cursor: default; }
+  .btn.primary { color: var(--accent); border-color: #1f4f4a; }
+  .btn.ghost { background: none; color: var(--ink2); }
   .stage { flex: 1; overflow-y: auto; display: flex; justify-content: center; padding: 28px 24px 40px; }
   .card { width: min(900px, 100%); display: flex; flex-direction: column; gap: 18px; }
   .meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--ink2); font-size: 13px;
@@ -50,18 +59,51 @@
   .badge { font-size: 12px; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); }
   .badge.warn { color: var(--warm); border-color: #5a4430; }
   .badge.own { color: var(--accent); border-color: #1f4f4a; }
+  .status { color: var(--ink2); min-height: 1.4em; }
+  .status.err { color: var(--rec); }
+  .status.good { color: var(--ok); }
+  .keys { color: var(--ink3); font-size: 12px; line-height: 1.9; }
+  .keys kbd { background: var(--panel); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px;
+    padding: 0 5px; color: var(--ink2); font: 11px ui-monospace, monospace; }
+  /* ---- decide: the options, your own wording, remove ---- */
+  .den { font-size: 17px; }
+  .den b, .en b { color: var(--ink3); font-weight: 500; margin-right: 6px; }
+  .den .dim { color: var(--ink3); font-size: 13px; }
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt { display: grid; grid-template-columns: 30px 1fr auto; gap: 16px; align-items: center;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px 10px 16px; }
+  .opt.picked { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .opt .lbl { color: var(--ink2); text-align: center; font-variant-numeric: tabular-nums; }
+  .opt .lbl .star { color: var(--warm); display: block; font-size: 13px; line-height: 1; }
+  .ar { font-family: "Amiri", serif; direction: rtl; text-align: right; font-size: 30px; line-height: 1.65; }
+  .opts.removed .ar { opacity: .45; }
+  .opt textarea, .own textarea { font-family: "Amiri", serif; direction: rtl; text-align: right; font-size: 30px;
+    line-height: 1.65; color: var(--ink); background: var(--bg); border: 1px solid var(--accent); border-radius: 10px;
+    padding: 6px 14px; resize: none; overflow: hidden; width: 100%; outline: none; }
+  .opt .acts { display: flex; flex-direction: column; gap: 6px; min-width: 104px; }
+  .chip { color: var(--accent); font-size: 13px; text-align: center; padding: 6px 0; }
+  .own { display: flex; flex-direction: column; gap: 8px; }
+  .own textarea { background: var(--panel); border-color: var(--line); font-size: 26px; min-height: 58px; }
+  .own textarea:focus { border-color: var(--accent); }
+  .own.picked textarea { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .own .row { display: flex; gap: 10px; align-items: center; color: var(--ink3); font-size: 12px; }
+  .own .row .spacer { flex: 1; }
+  .notes { display: flex; flex-direction: column; gap: 6px; color: var(--ink2); font-size: 13px; }
+  .notes p { margin: 0; padding-left: 10px; border-left: 2px solid var(--line); }
+  .notes p.warn { color: var(--warm); border-left-color: var(--warm); }
+  /* ---- record: the line, its neighbours, the editor ---- */
   .editor { display: none; flex-direction: column; gap: 10px; }
   .editor textarea { font-family: "Amiri", serif; direction: rtl; text-align: right; font-size: 34px; line-height: 1.6;
     background: var(--panel); color: var(--ink); border: 1px solid var(--accent); border-radius: 14px;
     padding: 18px 24px; resize: vertical; min-height: 130px; }
   .editor .row { display: flex; gap: 10px; align-items: center; color: var(--ink3); font-size: 12px; }
   .editing .now { display: none; }
-  .editing .editor { display: flex; }
+  body.record .editing .editor { display: flex; }
   .ctx { font-family: "Amiri", serif; direction: rtl; text-align: right; color: var(--ink3); font-size: 22px; min-height: 1.6em; }
   .now { font-family: "Amiri", serif; direction: rtl; text-align: right; font-size: 42px; line-height: 1.7;
     background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px 32px; }
+  .now.pending { color: var(--ink3); font-family: inherit; font-size: 20px; direction: ltr; text-align: left; }
   .en { color: var(--ink2); font-size: 14px; }
-  .en b { color: var(--ink3); font-weight: 500; margin-right: 6px; }
   /* ---- record controls ---- */
   .controls { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
   .rec { width: 84px; height: 84px; border-radius: 50%; border: 3px solid var(--line); background: var(--panel);
@@ -76,9 +118,6 @@
   .meter { height: 8px; background: var(--panel); border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
   .meter i { display: block; height: 100%; width: 0; background: var(--accent); }
   .meter.hot i { background: var(--rec); }
-  .status { color: var(--ink2); min-height: 1.4em; }
-  .status.err { color: var(--rec); }
-  .status.good { color: var(--ok); }
   .nav { display: flex; gap: 10px; }
   /* ---- takes ---- */
   .takes { border-top: 1px solid var(--line); padding-top: 14px; display: flex; flex-direction: column; gap: 6px; }
@@ -90,50 +129,69 @@
   .take .dim { color: var(--ink2); }
   .take .old { color: var(--warm); }
   .take .spacer { flex: 1; }
-  .keys { color: var(--ink3); font-size: 12px; }
-  .keys kbd { background: var(--panel); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px;
-    padding: 0 5px; color: var(--ink2); font: 11px ui-monospace, monospace; }
-  .overlay { position: fixed; inset: 0; background: rgba(8,9,13,.86); display: grid; place-items: center; z-index: 5; }
+  .overlay { position: fixed; inset: 0; background: rgba(8,9,13,.86); display: none; place-items: center; z-index: 5; }
   .overlay .box { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 28px 32px;
     max-width: 460px; display: flex; flex-direction: column; gap: 14px; }
   .overlay .box p { margin: 0; color: var(--ink2); }
-  .overlay .btn { background: var(--accent); color: #062321; border: none; font-weight: 600; padding: 10px 16px; }
-  @media (max-width: 800px) { .app { grid-template-columns: 1fr; } aside { display: none; } .now { font-size: 32px; } }
+  .overlay .row { display: flex; gap: 10px; }
+  .overlay #enable { background: var(--accent); color: #062321; border: none; font-weight: 600; padding: 10px 16px; }
+  @media (max-width: 800px) { .app { grid-template-columns: 1fr; } aside { display: none; } .now { font-size: 32px; }
+    .opt { grid-template-columns: 1fr; } .opt .acts { flex-direction: row; } }
 </style>
 </head>
-<body>
+<body class="decide">
 <div class="app">
   <aside id="list"></aside>
   <main>
     <header>
       <span class="title">Arabic narration</span>
+      <span class="modes" id="modes">
+        <button data-mode="decide" title="Pick each line's wording (M)">Decide</button>
+        <button data-mode="record" title="Record the decided lines (M)">Record</button>
+      </span>
       <span class="progress" id="progress"></span>
       <span class="spacer"></span>
-      <label>Mic <select id="mic"></select></label>
-      <label><input type="checkbox" id="autoplay"> Play back each take</label>
-      <button class="btn" id="reload" title="Re-read config/narration_ar.json">Reload lines</button>
+      <label class="decide-only"><input type="checkbox" id="autonext"> Next line after a pick</label>
+      <label class="rec-only">Mic <select id="mic"></select></label>
+      <label class="rec-only"><input type="checkbox" id="autoplay"> Play back each take</label>
+      <button class="btn" id="reload" title="Re-read docs/arabic_script.md">Reload</button>
     </header>
     <div class="stage">
       <div class="card" id="card">
         <div class="meta" id="meta"></div>
-        <div class="ctx" id="prev"></div>
-        <div class="now" id="now"></div>
-        <div class="editor">
+        <!-- decide -->
+        <div class="den decide-only" id="den"></div>
+        <div class="opts decide-only" id="opts"></div>
+        <div class="own decide-only" id="ownbox">
+          <textarea id="own" dir="rtl" spellcheck="false" rows="1" placeholder="…أو اكتب صياغتك هون"></textarea>
+          <div class="row">
+            <button class="btn" id="ownuse">Use my wording</button>
+            <span id="ownstate"><kbd>⌘</kbd>+<kbd>Enter</kbd></span>
+            <span class="spacer"></span>
+            <button class="btn ghost" id="remove">Remove this line</button>
+          </div>
+        </div>
+        <div class="notes decide-only" id="notes"></div>
+        <!-- record -->
+        <div class="ctx rec-only" id="prev"></div>
+        <div class="now rec-only" id="now"></div>
+        <div class="editor rec-only">
           <textarea id="edittext" dir="rtl" spellcheck="false"></textarea>
           <div class="row">
             <button class="btn" id="editsave">Save wording</button>
             <button class="btn" id="editcancel">Cancel</button>
-            <span><kbd>⌘</kbd>+<kbd>Enter</kbd> save · <kbd>Esc</kbd> cancel · earlier takes of this line get marked "older wording"</span>
+            <span><kbd>⌘</kbd>+<kbd>Enter</kbd> save · <kbd>Esc</kbd> cancel · changes the option this line uses (or your wording)
+              in docs/arabic_script.md; earlier takes get marked "older wording" (if a take already says the new wording,
+              press "Mark as current" on it)</span>
           </div>
         </div>
-        <div class="ctx" id="next"></div>
-        <div class="en" id="en"></div>
-        <div class="controls">
+        <div class="ctx rec-only" id="next"></div>
+        <div class="en rec-only" id="en"></div>
+        <div class="controls rec-only">
           <button class="rec" id="rec" title="Record / stop (Space)"><i></i></button>
           <div class="readout">
             <div class="timer" id="timer">0.0 s<small id="target"></small></div>
             <div class="meter" id="meter"><i></i></div>
-            <div class="status" id="status"></div>
           </div>
           <div class="nav">
             <button class="btn" id="edit" title="Edit this line's wording (E)">✎ Edit line</button>
@@ -142,10 +200,9 @@
             <button class="btn" id="fwd" title="Next line (→ or Enter)">Next →</button>
           </div>
         </div>
-        <div class="takes" id="takes"></div>
-        <div class="keys"><kbd>Space</kbd> record / stop &nbsp; <kbd>P</kbd> play chosen take &nbsp;
-          <kbd>→</kbd> or <kbd>Enter</kbd> next &nbsp; <kbd>←</kbd> back &nbsp;·&nbsp; Recording again adds a new
-          take and makes it the chosen one; earlier takes stay and can be chosen back.</div>
+        <div class="status" id="status"></div>
+        <div class="takes rec-only" id="takes"></div>
+        <div class="keys" id="keys"></div>
       </div>
     </div>
   </main>
@@ -153,11 +210,14 @@
 <div class="overlay" id="overlay">
   <div class="box">
     <strong>Record the Arabic narration</strong>
-    <p>One card per line, grouped by bit, showing your decided Arabic from config/narration_ar.json.
-      Press Space (or the red button) when you start speaking and again when you finish. Every take is saved
-      under the line's key. Lines still waiting for a decision show but can't be recorded yet.</p>
+    <p>One card per decided line, grouped by bit. Press Space (or the red button) when you start speaking and
+      again when you finish. Every take is saved under the line's key. Lines still waiting for a decision show
+      but can't be recorded yet.</p>
     <p>Recording is raw, with no echo cancellation, noise suppression, or auto gain, so use headphones for playback.</p>
-    <button class="btn" id="enable">Enable microphone</button>
+    <div class="row">
+      <button class="btn" id="enable">Enable microphone</button>
+      <button class="btn ghost" id="todecide">Back to Decide</button>
+    </div>
     <p class="status err" id="micerr"></p>
   </div>
 </div>
@@ -168,97 +228,253 @@ const PREROLL_S = 0.3;          // audio kept from just before you press record,
 const MIN_TAKE_S = 0.5;         // shorter than this = an accidental press; not saved
 const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
                 set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const KEYS = {
+  decide: `<kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> pick that option &nbsp; <kbd>E</kbd> change an option's letters first
+    (<kbd>⌘</kbd>+<kbd>Enter</kbd> saves and picks it) &nbsp; <kbd>O</kbd> your own wording &nbsp;
+    <kbd>→</kbd> or <kbd>Enter</kbd> next &nbsp; <kbd>←</kbd> back &nbsp; <kbd>M</kbd> Record
+    &nbsp;·&nbsp; Every choice is written after <b>Decision:</b> in docs/arabic_script.md; an edited option is
+    rewritten there and keeps its number.`,
+  record: `<kbd>Space</kbd> record / stop &nbsp; <kbd>P</kbd> play chosen take &nbsp; <kbd>E</kbd> edit the wording &nbsp;
+    <kbd>→</kbd> or <kbd>Enter</kbd> next &nbsp; <kbd>←</kbd> back &nbsp; <kbd>M</kbd> Decide &nbsp;·&nbsp; Recording again
+    adds a new take and makes it the chosen one; earlier takes stay and can be chosen back.`,
+};
 
-let lines = [], idx = 0;
+let lines = [], idx = 0, mode = store.get("rec_mode") || "";
+let optEdit = null;             // {key, n, text}: an option open for editing (Decide)
+let ownDraft = null;            // {key, text}: own wording typed but not used yet (Decide)
 let ctx = null, stream = null, src = null, tap = null;
 let recording = false, rec = [], pre = [], preLen = 0, peak = 0, clipped = false, t0 = 0;
 let player = null;
 
 // ---------------------------------------------------------------- lines
 async function loadLines(keepKey) {
-  const r = await fetch("/api/lines");
-  const data = await r.json();
-  if (data.error) { setStatus(data.error, "err"); return; }
+  let data;
+  try { data = await (await fetch("/api/lines")).json(); }
+  catch (err) { return setStatus(`Can't reach the recorder: ${err.message}`, "err"); }
+  if (data.error) return setStatus(data.error, "err");
   lines = data.lines;
+  if (!mode) mode = lines.some(isOpen) ? "decide" : "record";
   const want = keepKey ?? store.get("rec_key");
   const at = lines.findIndex((l) => l.key === want);
-  idx = at >= 0 ? at : Math.max(0, lines.findIndex((l) => l.status === "ready" && !isDone(l)));
+  idx = at >= 0 ? at : firstOpen();
   render();
 }
 const chosenTake = (l) => l.takes.find((t) => t.file === l.chosen);
-const isDone = (l) => !!chosenTake(l) && chosenTake(l).text === l.text;
-const isStale = (l) => !!chosenTake(l) && chosenTake(l).text !== l.text;
+const says = (t) => t.says ?? t.text;          // what the take says: the wording shown, or the one it was marked current for
+const isDone = (l) => l.status === "ready" && !!chosenTake(l) && says(chosenTake(l)) === l.text;
+const isStale = (l) => !!chosenTake(l) && says(chosenTake(l)) !== l.text;
+const isRemoved = (l) => l.status === "removed";
+const isOpen = (l) => l.status === "pending" || l.status === "needs review";
+function firstOpen() {
+  return Math.max(0, mode === "decide" ? lines.findIndex(isOpen)
+                                       : lines.findIndex((l) => l.status === "ready" && !isDone(l)));
+}
 
 function render() {
   const l = lines[idx];
   if (!l) return;
   store.set("rec_key", l.key);
-  const done = lines.filter(isDone).length, ready = lines.filter((x) => x.status === "ready").length;
-  $("progress").textContent = `${done} / ${lines.length} recorded` + (ready < lines.length ? ` · ${lines.length - ready} not decided yet` : "");
+  document.body.className = mode;
+  document.querySelectorAll("#modes button").forEach((b) => b.classList.toggle("on", b.dataset.mode === mode));
+  renderProgress();
+  renderList();
+  renderMeta(l);
+  if (mode === "decide") renderDecide(l); else renderRecord(l);
+  $("keys").innerHTML = KEYS[mode];
+}
 
-  // sidebar
+function renderProgress() {
+  const count = (f) => lines.filter(f).length;
+  if (mode === "decide") {
+    const removed = count(isRemoved), review = count((l) => l.status === "needs review");
+    $("progress").textContent = `${count((l) => l.status === "ready" || isRemoved(l))} / ${lines.length} decided` +
+      (removed ? ` · ${removed} removed` : "") + (review ? ` · ${review} need a look` : "");
+  } else {
+    const kept = lines.filter((l) => !isRemoved(l)), open = kept.filter((l) => l.status !== "ready").length;
+    $("progress").textContent = `${kept.filter(isDone).length} / ${kept.length} recorded` +
+      (open ? ` · ${open} not decided yet` : "");
+  }
+}
+
+function renderList() {
   const list = $("list"); list.innerHTML = "";
   let seg = null;
   lines.forEach((x, i) => {
-    if (x.segment !== seg) { seg = x.segment; const h = document.createElement("h2"); h.textContent = x.segment_title; list.append(h); }
-    const d = document.createElement("div");
-    const pend = x.status !== "ready";
-    d.className = "item" + (i === idx ? " cur" : "") + (pend ? " pending" : "");
-    d.title = pend ? "not decided yet" : x.text;
-    d.innerHTML = `<span class="dot ${pend ? "pending" : isDone(x) ? "done" : isStale(x) ? "stale" : ""}"></span><span class="n">${x.n}</span><span>${x.key}</span>`;
-    d.onclick = () => { if (!recording) { stopEdit(); idx = i; setStatus(""); render(); } };
+    if (x.segment !== seg) { seg = x.segment; list.append(el("h2", "", x.segment_title)); }
+    const dot = isRemoved(x) ? "removed" : x.status === "needs review" ? "review" : x.status !== "ready" ? "pending"
+      : mode === "decide" ? "decided" : isDone(x) ? "done" : isStale(x) ? "stale" : "";
+    const d = el("div", "item" + (i === idx ? " cur" : "") + (isRemoved(x) ? " removed" : x.status !== "ready" ? " pending" : ""));
+    d.title = x.text || (isRemoved(x) ? "removed" : "not decided yet");
+    d.innerHTML = `<span class="dot ${dot}"></span><span class="n">${x.n}</span><span>${x.key}</span>`;
+    d.onclick = () => select(i);
     list.append(d);
     if (i === idx) requestAnimationFrame(() => d.scrollIntoView({ block: "nearest" }));
   });
+}
 
-  // card
+function renderMeta(l) {
+  const badge = l.status === "pending" ? `<span class="badge warn">not decided yet</span>`
+    : l.status === "needs review" ? `<span class="badge warn">needs a look</span>`
+    : isRemoved(l) ? `<span class="badge">removed</span>`
+    : l.picked ? `<span class="badge own">option ${l.picked}</span>` : `<span class="badge own">your wording</span>`;
+  $("meta").innerHTML = `<span>${l.n} / ${lines.length}</span><span>${escapeHtml(l.segment_title)}</span>` +
+    `<code>${l.key}</code>` + (l.when ? `<span>${escapeHtml(l.when)}</span>` : "") + badge;
+}
+
+// ---------------------------------------------------------------- decide
+function renderDecide(l) {
+  $("den").innerHTML = `<b>EN</b>${escapeHtml(l.en)}` + (l.timing ? ` <span class="dim">· ${escapeHtml(l.timing)}</span>` : "");
+  const box = $("opts"); box.innerHTML = "";
+  box.classList.toggle("removed", isRemoved(l));
+  for (const o of l.options) {
+    const picked = o.n === l.picked;
+    const row = el("div", "opt" + (picked ? " picked" : ""));
+    const lbl = el("div", "lbl");
+    lbl.innerHTML = (o.star ? `<span class="star" title="recommended">★</span>` : "") + o.n;
+    row.append(lbl);
+    if (optEdit && optEdit.key === l.key && optEdit.n === o.n) {
+      const ta = el("textarea"); ta.dir = "rtl"; ta.spellcheck = false; ta.rows = 1;
+      ta.value = optEdit.text ?? o.text;
+      ta.oninput = () => { optEdit.text = ta.value; autoGrow(ta); };
+      ta.onkeydown = (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); saveOption(l, o.n, ta.value, true); }
+        else if (e.key === "Escape") { e.preventDefault(); optEdit = null; render(); }
+      };
+      const acts = el("div", "acts");
+      acts.append(btn("Save & pick", () => saveOption(l, o.n, ta.value, true), "primary", "⌘+Enter"),
+                  btn("Save", () => saveOption(l, o.n, ta.value, false)),
+                  btn("Cancel", () => { optEdit = null; render(); }, "ghost", "Esc"));
+      row.append(ta, acts);
+      requestAnimationFrame(() => {
+        autoGrow(ta);
+        if (document.activeElement !== ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+      });
+    } else {
+      const ar = el("div", "ar", o.text);
+      ar.title = "Double-click to change a few letters";
+      ar.ondblclick = () => startOptEdit(l, o.n);
+      const acts = el("div", "acts");
+      acts.append(picked ? el("div", "chip", "✓ picked") : btn(`Pick ${o.n}`, () => decide(l, String(o.n)), "primary", `Use this option (key ${o.n})`),
+                  btn("✎ Edit", () => startOptEdit(l, o.n), "", "Change a few letters, then pick it (E)"));
+      row.append(ar, acts);
+    }
+    box.append(row);
+  }
+  const own = $("own"), mine = l.source === "Ali's wording" ? l.decision : "";
+  if (own.dataset.key !== l.key || document.activeElement !== own) {   // never show one line's wording on another
+    if (own.dataset.key !== l.key) own.blur();
+    own.value = ownDraft && ownDraft.key === l.key ? ownDraft.text : mine;
+    own.dataset.key = l.key;
+  }
+  requestAnimationFrame(() => autoGrow(own));
+  const usingOwn = !!mine && l.status === "ready";
+  $("ownbox").classList.toggle("picked", usingOwn);
+  $("ownstate").innerHTML = usingOwn ? `<span class="chip">✓ using your wording</span>` : `<kbd>⌘</kbd>+<kbd>Enter</kbd>`;
+  $("remove").textContent = isRemoved(l) ? "Removed · pick an option to bring it back" : "Remove this line";
+  $("remove").disabled = isRemoved(l);
+  const notes = $("notes"); notes.innerHTML = "";
+  if (l.status === "needs review") notes.append(el("p", "warn", l.note));
+  for (const t of l.notes) {                  // Arabic quoted inside an English note keeps its own direction
+    const p = el("p");
+    p.innerHTML = escapeHtml(t).replace(/«([^»]*)»/g, '«<bdi dir="rtl">$1</bdi>»');
+    notes.append(p);
+  }
+}
+
+function startOptEdit(l, n) {
+  if (!l || !l.options.some((o) => o.n === n)) return;
+  optEdit = { key: l.key, n, text: null };
+  render();
+}
+
+async function decide(l, decision) {
+  try {
+    await post(`/api/decide?key=${encodeURIComponent(l.key)}`, { decision });
+    if (ownDraft && ownDraft.key === l.key) ownDraft = null;
+    optEdit = null;
+    await loadLines(l.key);
+    const what = decision === "remove" ? "removed" : /^\d$/.test(decision) ? `option ${decision}` : "your wording";
+    setStatus(`${l.key}: ${what}. Saved in docs/arabic_script.md.`, "good");
+    if ($("autonext").checked) go(1, true);
+  } catch (err) { setStatus(`Not saved: ${err.message}`, "err"); }
+}
+
+async function saveOption(l, n, text, pick) {
+  text = text.trim();
+  if (!text) return setStatus("An option can't be empty.", "err");
+  try {
+    await post(`/api/option?key=${encodeURIComponent(l.key)}`, { n, text, pick });
+    optEdit = null;
+    await loadLines(l.key);
+    setStatus(`${l.key}: option ${n} edited${pick ? " and picked" : ""}. Saved in docs/arabic_script.md.`, "good");
+    if (pick && $("autonext").checked) go(1, true);
+  } catch (err) { setStatus(`Not saved: ${err.message}`, "err"); }
+}
+
+function useOwn() {
+  const own = $("own"), text = own.value.trim(), l = lines.find((x) => x.key === own.dataset.key);
+  if (!text) return setStatus("Type your wording first.", "err");
+  if (!l) return;
+  own.blur();
+  decide(l, text);
+}
+
+// ---------------------------------------------------------------- record
+function renderRecord(l) {
   const pend = l.status !== "ready";
-  const badge = pend ? `<span class="badge warn">not decided yet</span>`
-    : l.edited ? `<span class="badge own">edited here</span>` : "";
-  $("meta").innerHTML = `<span>${l.n} / ${lines.length}</span><span>${escapeHtml(l.segment_title)}</span><code>${l.key}</code>` +
-    (l.en_seconds ? `<span>English: ${l.en_seconds.toFixed(1)} s</span>` : "") + badge;
-  $("prev").textContent = idx > 0 ? lines[idx - 1].text : "";
-  $("now").textContent = pend ? "No Arabic decided for this line yet. Once your decision is added to config/narration_ar.json, press Reload lines." : l.text;
+  const prev = neighbour(-1), next = neighbour(1);
+  $("prev").textContent = prev ? prev.text : "";
+  $("now").textContent = !pend ? l.text : isRemoved(l) ? "This line is removed."
+    : "No Arabic decided for this line yet. Pick one in Decide mode (M).";
   $("now").classList.toggle("pending", pend);
-  $("next").textContent = idx < lines.length - 1 ? lines[idx + 1].text : "";
+  $("next").textContent = next ? next.text : "";
   $("rec").disabled = pend && !recording;
   $("en").innerHTML = `<b>EN</b>${escapeHtml(l.en)}`;
   $("target").textContent = l.en_seconds ? `English ${l.en_seconds.toFixed(1)} s` : "";
   if (!recording) $("timer").firstChild.textContent = (chosenTake(l) ? chosenTake(l).seconds.toFixed(1) : "0.0") + " s";
-  $("back").disabled = recording || idx === 0;
-  $("fwd").disabled = recording || idx === lines.length - 1;
+  $("back").disabled = recording || !prev;
+  $("fwd").disabled = recording || !next;
   $("play").disabled = recording || !chosenTake(l);
+  $("edit").disabled = recording || pend;
   renderTakes(l);
+}
+
+function neighbour(d) {                      // the next line in that direction that isn't removed
+  for (let i = idx + d; i >= 0 && i < lines.length; i += d) if (!isRemoved(lines[i])) return lines[i];
+  return null;
 }
 
 function renderTakes(l) {
   const box = $("takes"); box.innerHTML = "";
   if (!l.takes.length) { box.innerHTML = `<h3>No takes yet</h3>`; return; }
-  const h = document.createElement("h3"); h.textContent = `Takes (${l.takes.length}); the highlighted one is used`; box.append(h);
+  box.append(el("h3", "", `Takes (${l.takes.length}); the highlighted one is used`));
   [...l.takes].reverse().forEach((t) => {
-    const row = document.createElement("div");
-    row.className = "take" + (t.file === l.chosen ? " chosen" : "");
-    const old = t.text !== l.text ? `<span class="old" title="${escapeHtml(t.text)}">older wording</span>` : "";
+    const row = el("div", "take" + (t.file === l.chosen ? " chosen" : ""));
+    const old = says(t) !== l.text ? `<span class="old" title="${escapeHtml(says(t))}">older wording</span>` : "";
     row.innerHTML = `<span class="name">${t.file}</span><span class="dim">${t.seconds.toFixed(1)} s</span>
       <span class="dim">${t.recorded.slice(11, 16)}</span>${old}<span class="spacer"></span>`;
-    const play = document.createElement("button"); play.className = "btn"; play.textContent = "▶";
-    play.onclick = () => playFile(t.file);
-    row.append(play);
-    if (t.file !== l.chosen) {
-      const use = document.createElement("button"); use.className = "btn"; use.textContent = "Use this take";
-      use.onclick = () => chooseTake(l, t.file);
-      row.append(use);
-    }
+    row.append(btn("▶", () => playFile(t.file)));
+    if (old && l.status === "ready") row.append(btn("Mark as current", () => markCurrent(l, t.file), "",
+      "You fixed the wording to match what you said: this take says the current wording"));
+    if (t.file !== l.chosen) row.append(btn("Use this take", () => chooseTake(l, t.file)));
     box.append(row);
   });
 }
 
 async function chooseTake(l, file) {
-  const r = await fetch(`/api/choose?key=${encodeURIComponent(l.key)}`, { method: "POST", body: JSON.stringify({ file }) });
-  const data = await r.json();
-  if (data.error) return setStatus(data.error, "err");
-  Object.assign(l, { takes: data.takes, chosen: data.chosen });
-  setStatus(`Using ${file}`, "good"); render();
+  try {
+    const data = await post(`/api/choose?key=${encodeURIComponent(l.key)}`, { file });
+    Object.assign(l, { takes: data.takes, chosen: data.chosen });
+    setStatus(`Using ${file}`, "good"); render();
+  } catch (err) { setStatus(err.message, "err"); }
+}
+
+async function markCurrent(l, file) {
+  try {
+    const data = await post(`/api/current?key=${encodeURIComponent(l.key)}`, { file });
+    Object.assign(l, { takes: data.takes, chosen: data.chosen });
+    setStatus(`${file} marked as saying the current wording.`, "good"); render();
+  } catch (err) { setStatus(err.message, "err"); }
 }
 
 function playFile(file) {
@@ -334,6 +550,7 @@ async function toggle() {
 
 function start() {
   if (player) player.pause();
+  stopEdit();
   rec = pre.slice(); pre = []; preLen = 0; clipped = false;
   recording = true; t0 = performance.now();
   $("rec").classList.add("on");
@@ -382,48 +599,94 @@ function encodeWav(samples, rate) {
   return new Blob([buf], { type: "audio/wav" });
 }
 
-// ---------------------------------------------------------------- ui glue
-function setStatus(msg, kind = "") { const s = $("status"); s.textContent = msg; s.className = "status " + kind; }
-function micError(err) {
-  const msg = `Microphone unavailable: ${err.message || err}. Allow mic access for localhost and try again.`;
-  $("micerr").textContent = msg; setStatus(msg, "err");
-}
-function escapeHtml(s) { return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
-function go(d) { if (recording) return; stopEdit(); idx = Math.max(0, Math.min(lines.length - 1, idx + d)); setStatus(""); render(); }
-
-$("rec").onclick = (e) => { e.currentTarget.blur(); toggle(); };
-$("fwd").onclick = () => go(1);
-$("back").onclick = () => go(-1);
-$("play").onclick = () => { const t = chosenTake(lines[idx]); if (t) playFile(t.file); };
-$("reload").onclick = () => loadLines(lines[idx] && lines[idx].key);
-$("enable").onclick = () => startMic().catch(micError);
-$("mic").onchange = (e) => startMic(e.target.value).catch(micError);
-$("autoplay").checked = store.get("rec_autoplay") === "1";
-$("autoplay").onchange = (e) => store.set("rec_autoplay", e.target.checked ? "1" : "0");
-window.addEventListener("focus", () => { if (!recording && lines.length) loadLines(lines[idx].key); });
-// ---------------------------------------------------------------- editing a line's wording
+// ---------------------------------------------------------------- editing a decided line's wording (Record)
 function startEdit() {
   const l = lines[idx];
-  if (!l || recording) return;
+  if (!l || recording || l.status !== "ready") return;
   $("edittext").value = l.text;
   $("card").classList.add("editing");
   $("edittext").focus();
-  setStatus("Editing the wording. Save, then record it again.");
+  setStatus(l.picked ? `Editing option ${l.picked}. Save, then record it again.` : "Editing your wording. Save, then record it again.");
 }
 function stopEdit() { $("card").classList.remove("editing"); }
 async function saveEdit() {
   const l = lines[idx], text = $("edittext").value.trim();
   if (!text) return setStatus("The line can't be empty.", "err");
   try {
-    const r = await fetch(`/api/edit?key=${encodeURIComponent(l.key)}`, { method: "POST", body: JSON.stringify({ text }) });
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-    Object.assign(l, { text: data.text, edited: true, status: "ready" });
+    if (l.picked) await post(`/api/option?key=${encodeURIComponent(l.key)}`, { n: l.picked, text, pick: false });
+    else await post(`/api/decide?key=${encodeURIComponent(l.key)}`, { decision: text });
     stopEdit();
-    setStatus("Wording saved. Press Space to record it.", "good");
-    render();
+    await loadLines(l.key);
+    setStatus("Wording saved in docs/arabic_script.md. Press Space to record it.", "good");
   } catch (err) { setStatus(`Not saved: ${err.message}`, "err"); }
 }
+
+// ---------------------------------------------------------------- ui glue
+function el(tag, cls = "", text = null) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== null) e.textContent = text;
+  return e;
+}
+function btn(label, onclick, cls = "", title = "") {
+  const b = el("button", "btn" + (cls ? " " + cls : ""), label);
+  if (title) b.title = title;
+  b.onclick = (e) => { e.currentTarget.blur(); onclick(); };
+  return b;
+}
+async function post(url, obj) {
+  const r = await fetch(url, { method: "POST", body: JSON.stringify(obj) });
+  const data = await r.json();
+  if (data.error) throw new Error(data.error);
+  return data;
+}
+function autoGrow(ta) { ta.style.height = "auto"; ta.style.height = ta.scrollHeight + 2 + "px"; }
+function setStatus(msg, kind = "") { const s = $("status"); s.textContent = msg; s.className = "status " + kind; }
+function micError(err) {
+  const msg = `Microphone unavailable: ${err.message || err}. Allow mic access for localhost and try again.`;
+  $("micerr").textContent = msg; setStatus(msg, "err");
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function closeEdits() { optEdit = null; stopEdit(); }
+function select(i) { if (recording) return; closeEdits(); idx = i; setStatus(""); render(); }
+function go(d, keepStatus = false) {
+  if (recording) return;
+  let i = idx + d;
+  if (mode === "record") while (i >= 0 && i < lines.length && isRemoved(lines[i])) i += d;
+  if (i < 0 || i >= lines.length) return;
+  closeEdits(); idx = i;
+  if (!keepStatus) setStatus("");
+  render();
+}
+function setMode(m) {
+  if (recording || !lines.length) return;
+  closeEdits();
+  mode = m; store.set("rec_mode", m);
+  if (m === "record" && isRemoved(lines[idx])) { const nx = neighbour(1) || neighbour(-1); if (nx) idx = lines.indexOf(nx); }
+  $("overlay").style.display = m === "record" && !ctx ? "grid" : "none";
+  setStatus(""); render();
+}
+
+$("rec").onclick = (e) => { e.currentTarget.blur(); toggle(); };
+$("fwd").onclick = () => go(1);
+$("back").onclick = () => go(-1);
+$("play").onclick = () => { const t = chosenTake(lines[idx]); if (t) playFile(t.file); };
+$("reload").onclick = (e) => { e.currentTarget.blur(); loadLines(lines[idx] && lines[idx].key); };
+$("enable").onclick = () => startMic().catch(micError);
+$("todecide").onclick = () => setMode("decide");
+$("mic").onchange = (e) => startMic(e.target.value).catch(micError);
+document.querySelectorAll("#modes button").forEach((b) => { b.onclick = (e) => { e.currentTarget.blur(); setMode(b.dataset.mode); }; });
+for (const [id, k, dflt] of [["autoplay", "rec_autoplay", "0"], ["autonext", "rec_autonext", "1"]]) {
+  $(id).checked = (store.get(k) ?? dflt) === "1";
+  $(id).onchange = (e) => { store.set(k, e.target.checked ? "1" : "0"); e.target.blur(); };
+}
+$("ownuse").onclick = (e) => { e.currentTarget.blur(); useOwn(); };
+$("remove").onclick = (e) => { e.currentTarget.blur(); decide(lines[idx], "remove"); };
+$("own").addEventListener("input", (e) => { ownDraft = { key: e.target.dataset.key, text: e.target.value }; autoGrow(e.target); });
+$("own").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); useOwn(); }
+  else if (e.key === "Escape") { e.preventDefault(); e.target.blur(); }
+});
 $("edit").onclick = (e) => { e.currentTarget.blur(); startEdit(); };
 $("editsave").onclick = saveEdit;
 $("editcancel").onclick = () => { stopEdit(); setStatus(""); };
@@ -431,17 +694,31 @@ $("edittext").addEventListener("keydown", (e) => {
   if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); saveEdit(); }
   else if (e.key === "Escape") { e.preventDefault(); stopEdit(); setStatus(""); }
 });
+window.addEventListener("focus", () => {        // pick up edits made in an editor meanwhile
+  if (!recording && lines.length && document.activeElement.tagName !== "TEXTAREA") loadLines(lines[idx].key);
+});
 
 window.addEventListener("keydown", (e) => {
-  if (e.target.tagName === "TEXTAREA") return;          // typing in the editor
-  if (e.key === "e" || e.key === "E") { if (!e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); startEdit(); } return; }
-  if (e.target.tagName === "SELECT" || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (e.code === "Space") { e.preventDefault(); toggle(); }
+  const t = e.target;
+  if (t.tagName === "TEXTAREA" || t.tagName === "SELECT" || (t.tagName === "INPUT" && t.type !== "checkbox")) return;
+  if (e.metaKey || e.ctrlKey || e.altKey || !lines.length) return;
+  const l = lines[idx];
+  if (e.key === "m" || e.key === "M") { e.preventDefault(); setMode(mode === "decide" ? "record" : "decide"); }
   else if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); go(1); }
   else if (e.key === "ArrowLeft") { e.preventDefault(); go(-1); }
-  else if (e.key === "p" || e.key === "P") { const t = chosenTake(lines[idx]); if (t && !recording) playFile(t.file); }
+  else if (mode === "decide") {
+    if (/^[1-9]$/.test(e.key) && l.options.some((o) => o.n === +e.key)) { e.preventDefault(); decide(l, e.key); }
+    else if (e.key === "e" || e.key === "E") {
+      e.preventDefault(); startOptEdit(l, l.picked || (l.options.find((o) => o.star) || l.options[0] || {}).n);
+    }
+    else if (e.key === "o" || e.key === "O") { e.preventDefault(); $("own").focus(); }
+  }
+  else if (e.code === "Space") { e.preventDefault(); toggle(); }
+  else if (e.key === "e" || e.key === "E") { e.preventDefault(); startEdit(); }
+  else if (e.key === "p" || e.key === "P") { const tk = chosenTake(l); if (tk && !recording) playFile(tk.file); }
 });
-loadLines();
+
+loadLines().then(() => { $("overlay").style.display = mode === "record" && !ctx ? "grid" : "none"; });
 meterLoop();
 </script>
 </body>

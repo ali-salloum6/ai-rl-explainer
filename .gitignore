@@ -48,7 +48,8 @@ config/adobe_enhance_token.txt
 .local/
 
 # Upstream Manim / lesson clones — install per README or attach as submodules
-manim/
+# (/manim without a trailing slash also matches manim as a symlink to a sibling checkout)
+/manim
 videos/
 
 # Tests / packaging
@@ -64,3 +65,9 @@ build/
 media/frame_check/
 # Per-segment review keyframes (scripts/export_keyframes.py)
 keyframes/
+# Raw thumbnail stills (our_scenes/thumbnail.py); the finished files are docs/youtube/thumbnails/
+media/thumbnails/
+# Each segment's last frame (scripts/render_segments.py), the next segment opens on it
+media/frames/
+# Narration timing logs written by the scenes
+media/timing/

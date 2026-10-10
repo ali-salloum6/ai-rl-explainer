@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Local recorder for the Arabic narration.
+Local page for the Arabic narration: decide each line, then record it.
 
-Shows the Arabic narration one line at a time and records each line from the browser's microphone.
-The lines come from config/narration_ar.json: the decisions in docs/arabic_script.md, read and turned
-into plain text by Claude (a decision can also be an instruction, e.g. "remove this line", so the
-recorder never reads the decisions itself). Lines are grouped by bit; "pending" lines show but can't
-be recorded yet, "removed" ones are skipped. The file is re-read on every page load.
+Decide mode shows every line of docs/arabic_script.md with its options: pick one, change a few letters of
+an option first, write your own wording, or remove the line. Each choice is written into the file after the
+line's **Decision:** (an edited option is rewritten in place and keeps its number), exactly as if typed there,
+through scripts/build_narration_ar.py, which also rebuilds config/narration_ar.json. The file is re-read on
+every request, so edits made in an editor show up on the next reload.
 
-A line's text can be edited on its card. The new wording is written into config/narration_ar.json
-and kept in config/narration_ar_edits.json (with the wording it replaced), which
-scripts/build_narration_ar.py applies last, so an edit made here survives a rebuild from the script.
+Record mode shows the decided Arabic one line at a time and records it from the browser's microphone. Lines
+are grouped by bit; undecided lines show but can't be recorded yet, removed ones are skipped. Editing a
+line's wording here (E) edits the option it uses, or your own wording, in the same file.
 
 Every take is kept; nothing is ever overwritten or deleted:
 
@@ -19,10 +19,14 @@ Every take is kept; nothing is ever overwritten or deleted:
   media/audio/lines_ar/manifest.json                            per line: the Arabic you were shown for every take,
                                                                 its length, when it was recorded, which take is chosen
 
+If you said a line a little differently and then fixed its wording to match, "Mark as current" on the take
+records that it says the new wording (a "says" field next to the wording you were shown; nothing else changes).
+
 <key> is the line's key in config/narration.json (hook.1, bit3_chat.12, ...), so a file name says which
 line it is, and manifest.json says exactly which words were read in it.
 
 Run:  python3 scripts/record_server.py      then open http://localhost:8765 (Chrome or Safari)
+      (RECORDER_SCRIPT / RECORDER_LINES / RECORDER_OUT / RECORDER_PORT point it elsewhere, e.g. to test on copies)
 """
 from __future__ import annotations
 
@@ -32,15 +36,19 @@ import json
 import os
 import re
 import shutil
+import sys
 import threading
 import urllib.parse
 import wave
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import build_narration_ar as nar  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
-LINES_FILE = Path(os.environ.get("RECORDER_LINES", REPO_ROOT / "config" / "narration_ar.json"))
-EDITS_FILE = LINES_FILE.with_name(LINES_FILE.stem + "_edits.json")
+nar.MD = Path(os.environ.get("RECORDER_SCRIPT", nar.MD))
+nar.OUT = Path(os.environ.get("RECORDER_LINES", nar.OUT))
 EN_INDEX = REPO_ROOT / "media" / "audio" / "lines" / "index.json"
 OUT_DIR = Path(os.environ.get("RECORDER_OUT", REPO_ROOT / "media" / "audio" / "lines_ar"))
 TAKES_DIR = OUT_DIR / "takes"
@@ -55,17 +63,20 @@ _lock = threading.Lock()
 
 
 def read_lines() -> list[dict]:
-    """Recordable lines in order, from config/narration_ar.json (removed lines left out)."""
-    doc = json.loads(LINES_FILE.read_text(encoding="utf-8"))
+    """Every line in order, with its options and decision from docs/arabic_script.md. config/narration_ar.json
+    is rebuilt from the file on every read, so the two never disagree. Removed lines are included (they can
+    be brought back), and are never recordable."""
+    doc, _, _ = nar.build()
+    info = {b["key"]: b for b in nar.blocks()}
     out = []
     for seg in doc["segments"]:
         for ln in seg["lines"]:
-            if ln.get("status") == "removed":
-                continue
+            b = info[ln["key"]]
             out.append({"key": ln["key"], "segment": seg["id"], "segment_title": seg.get("title", seg["id"]),
-                        "en": ln.get("en", ""), "text": ln.get("ar") or "",
-                        "status": ln.get("status", "ready"), "note": ln.get("note", ""),
-                        "edited": ln.get("source") == "edited in recorder"})
+                        "en": ln.get("en", ""), "text": ln.get("ar") or "", "status": ln.get("status", "pending"),
+                        "note": ln.get("note", ""), "source": ln.get("source", ""), "picked": nar.picked(b),
+                        "options": b["options"], "notes": b["notes"], "decision": b["decision"],
+                        "when": b["when"], "timing": b["timing"]})
     return out
 
 
@@ -124,37 +135,18 @@ def save_take(key: str, body: bytes, shown_text: str) -> dict:
     return rec
 
 
-def _write_json(path: Path, doc: dict) -> None:
-    tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    tmp.replace(path)
-
-
-def edit_line(key: str, text: str) -> dict:
-    """New wording for line `key`: into narration_ar.json now, and into the edits file so a rebuild
-    from docs/arabic_script.md keeps it."""
-    text = " ".join(text.replace("\u200f", "").replace("\u200e", "").split())
-    if not text:
-        raise ValueError("empty line")
+def mark_current(key: str, name: str, text: str) -> dict:
+    """Take `name` says `text`, the line's current wording (it was re-worded after recording to match the take)."""
     with _lock:
-        doc = json.loads(LINES_FILE.read_text(encoding="utf-8"))
-        line = next((ln for seg in doc["segments"] for ln in seg["lines"] if ln["key"] == key), None)
-        if line is None or line.get("status") == "removed":
-            raise KeyError(f"no line {key}")
-        was = line.get("ar")
-        if text == was:
-            return line
-        line.update(ar=text, status="ready", source="edited in recorder")
-        _write_json(LINES_FILE, doc)
-        edits = (json.loads(EDITS_FILE.read_text(encoding="utf-8")) if EDITS_FILE.is_file() else
-                 {"notes": "Lines re-worded in the recorder (scripts/record_server.py). "
-                           "scripts/build_narration_ar.py applies these last.", "lines": {}})
-        prev = edits["lines"].get(key, {})
-        edits["lines"][key] = {"ar": text, "was": prev.get("was", was),
-                               "edited": _dt.datetime.now().isoformat(timespec="seconds")}
-        _write_json(EDITS_FILE, edits)
-    print(f"edited {key}: {text}", flush=True)
-    return line
+        man = load_manifest()
+        rec = man["lines"].get(key)
+        take = next((t for t in rec["takes"] if t["file"] == name), None) if rec else None
+        if take is None:
+            raise KeyError(f"no take {name} for {key}")
+        take["says"] = text
+        take["confirmed"] = _dt.datetime.now().isoformat(timespec="seconds")
+        save_manifest(man)
+    return rec
 
 
 def choose_take(key: str, name: str) -> dict:
@@ -192,10 +184,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, FONT.read_bytes(), "font/ttf")
         if url.path == "/api/lines":
             try:
-                return self._json({"lines": lines_payload(), "source": os.path.relpath(LINES_FILE, REPO_ROOT),
+                return self._json({"lines": lines_payload(), "source": os.path.relpath(nar.MD, REPO_ROOT),
                                    "out_dir": str(OUT_DIR)})
             except Exception as e:
-                return self._json({"error": f"could not read {LINES_FILE.name}: {e}"}, 500)
+                return self._json({"error": f"could not read {nar.MD.name}: {e}"}, 500)
         if url.path.startswith("/audio/"):
             name = urllib.parse.unquote(url.path[len("/audio/"):])
             if TAKE_RE.match(name) and (TAKES_DIR / name).is_file():
@@ -221,9 +213,26 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(rec)
             if url.path == "/api/choose":
                 return self._json(choose_take(key, json.loads(body)["file"]))
-            if url.path == "/api/edit":
-                line = edit_line(key, json.loads(body)["text"])
-                return self._json({"text": line["ar"], "edited": True})
+            if url.path == "/api/current":          # body {"file": "<key>__t03.wav"}: it says the current wording
+                line = next((ln for ln in read_lines() if ln["key"] == key and ln["status"] == "ready"), None)
+                if line is None:
+                    return self._json({"error": f"{key} has no decided wording"}, 409)
+                rec = mark_current(key, json.loads(body)["file"], line["text"])
+                print(f"marked current: {json.loads(body)['file']} says {line['text']}", flush=True)
+                return self._json(rec)
+            if url.path == "/api/decide":           # body {"decision": "2" | "remove" | Arabic wording | ""}
+                value = json.loads(body)["decision"]
+                nar.set_decision(key, value)
+                print(f"decided {key}: {value}", flush=True)
+                return self._json({"ok": True})
+            if url.path == "/api/option":           # body {"n": 2, "text": "...", "pick": true}
+                req = json.loads(body)
+                n = int(req["n"])
+                nar.set_option(key, n, req["text"])
+                if req.get("pick"):
+                    nar.set_decision(key, str(n))
+                print(f"option {n} of {key}{' (picked)' if req.get('pick') else ''}: {req['text']}", flush=True)
+                return self._json({"ok": True})
         except ValueError as e:
             return self._json({"error": str(e)}, 400)
         except (wave.Error, EOFError) as e:
@@ -234,10 +243,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    read_lines()  # fail early if the lines file can't be read
+    read_lines()  # fail early if docs/arabic_script.md can't be read
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
-    print(f"Recorder on http://localhost:{PORT}  (lines from {os.path.relpath(LINES_FILE, REPO_ROOT)}, "
-          f"takes to {OUT_DIR}/)", flush=True)
+    print(f"Recorder on http://localhost:{PORT}  (decisions in {nar.MD}, takes to {OUT_DIR}/)", flush=True)
     try:
         srv.serve_forever()
     except KeyboardInterrupt:

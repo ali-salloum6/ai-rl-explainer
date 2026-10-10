@@ -3,9 +3,10 @@
 Clean the chosen Arabic takes (scripts/record_server.py) into the narration the scenes are timed to.
 
 When scripts/enhance_takes.py has run a take through Adobe Enhance Speech, the enhanced audio is
-what gets used; the cuts are still measured on the raw take (same length, sample-aligned), so a
-line keeps its length whether or not it has been enhanced, and Adobe's clean-up replaces step 4's
-noise reduction.
+what gets used, and the speech is found in it too: Adobe removes the room noise (the floor drops
+from about -40 to -73 dB), while on the raw takes the noise hid the quieter syllables and lines
+were cut short. Adobe's clean-up replaces step 4's noise reduction. A line spoken faster than
+MAX_LETTERS_PER_S after trimming is reported: it was probably cut short.
 
 For every line in config/narration_ar.json with status "ready", takes the chosen take from
 media/audio/lines_ar/manifest.json and:
@@ -54,6 +55,7 @@ LONG_PAUSE, KEEP_PAUSE = 0.75, 0.50
 LEAD, TAIL = 0.05, 0.08  # padding kept before the first / after the last voiced frame
 OUT_RATE = 48000
 TARGET_LUFS, PEAK_DB = -20.0, -3.0
+MAX_LETTERS_PER_S = 20.0  # natural Syrian narration runs ~12-16 letters/s; faster = probably clipped
 
 
 def read_wav(path: Path) -> tuple[np.ndarray, int]:
@@ -238,11 +240,10 @@ def main() -> None:
             problems.append(f"{key}: no take recorded")
             continue
         chosen = next(t for t in rec["takes"] if t["file"] == rec["chosen"])
-        if chosen["text"] != ln["ar"]:
+        if chosen.get("says", chosen["text"]) != ln["ar"]:   # "says": marked current in the recorder
             problems.append(f"{key}: the chosen take ({rec['chosen']}) says older wording; record the line again")
             continue
         x, sr = read_wav(TAKES / "takes" / rec["chosen"])
-        spans, info = speech_phrases(x, sr)          # cuts are measured on the raw take
         enh = ENHANCED / rec["chosen"]
         if enh.is_file():
             xe, sre = read_wav(enh)
@@ -253,6 +254,7 @@ def main() -> None:
                 x, sr = xe, sre
         else:
             enh = None
+        spans, info = speech_phrases(x, sr)          # on the audio that is used (Adobe's, when there)
         gap_target = {}
         rule = inner.get(key)
         if rule and len(spans) > 1:
@@ -275,6 +277,9 @@ def main() -> None:
         if shortened:
             edits += "; pause " + ", ".join(f"{g:.2f}s→{to:.2f}s at {t:.1f}s" for t, g, to in shortened)
         print(f"{key:16s} {rec['chosen']:24s} {len(x) / sr:5.2f}s {dur:5.2f}s  {'enh' if enh else 'raw'}  {edits}")
+        rate = len(re.sub(r"[\W_\d]", "", ln["ar"])) / max(dur, 1e-3)
+        if rate > MAX_LETTERS_PER_S:
+            problems.append(f"{key}: {rate:.0f} letters/s after trimming; probably cut short (check the take)")
     tmp = INDEX.with_suffix(".tmp")
     tmp.write_text(json.dumps(index, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     tmp.replace(INDEX)

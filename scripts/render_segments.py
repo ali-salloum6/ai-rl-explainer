@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +26,20 @@ DEFAULT_SCENES = REPO_ROOT / "config/scenes_manifest.json"
 DEFAULT_AUDIO = REPO_ROOT / "config/audio_manifest.json"
 PREVIEW_WIDTH = 854
 HD_WIDTH = 1920
+
+
+FRAMES_DIR = REPO_ROOT / "media" / "frames"
+
+
+def save_last_frame(video: Path, scene_class: str) -> None:
+    """The render's last frame as media/frames/<Scene>_last.png: the next segment opens on it
+    (AgentScene.continue_from), so render segments in order. Kept current with the video."""
+    out = FRAMES_DIR / f"{scene_class}_last.png"
+    if not video.is_file() or (out.is_file() and out.stat().st_mtime >= video.stat().st_mtime):
+        return
+    FRAMES_DIR.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-sseof", "-0.05", "-i", str(video), "-frames:v", "1",
+                    "-update", "1", str(out)], check=True)
 
 
 def load_json(path: Path) -> dict:
@@ -157,6 +172,10 @@ def main() -> None:
         sys.exit(f"Missing manimgl at {manim_path}")
 
     flags = ["-w", "--hd" if hd else "-l", "--video_dir", "./media"]
+    # ManimGL needs an OpenGL display: on a headless machine (a cloud session) run it inside Xvfb.
+    wrap = []
+    if not os.environ.get("DISPLAY") and shutil.which("xvfb-run"):
+        wrap = ["xvfb-run", "-a", "-s", "-screen 0 1920x1080x24"]
     rendered = skipped = 0
 
     for entry in entries:
@@ -169,15 +188,18 @@ def main() -> None:
         if not args.force and not needs:
             print(f"skip {seg_id}: {reason}")
             skipped += 1
+            if not args.dry_run:
+                save_last_frame(video_path, parse_scene(entry["scene"])[1])
             continue
 
         scene_file, scene_class = parse_scene(entry["scene"])
-        cmd = [str(manim_path), scene_file, scene_class, *flags, *args.manim_args]
+        cmd = [*wrap, str(manim_path), scene_file, scene_class, *flags, *args.manim_args]
         label = "dry-run" if args.dry_run else ("render" if needs else "force")
         print(f"{label} {seg_id}: {reason if needs else 'forced'}")
         print("  ", " ".join(cmd))
         if not args.dry_run:
             subprocess.run(cmd, cwd=REPO_ROOT, check=True)
+            save_last_frame(video_path, scene_class)
         rendered += 1
 
     qual = "HD" if hd else "preview"

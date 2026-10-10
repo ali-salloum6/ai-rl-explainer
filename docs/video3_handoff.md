@@ -56,6 +56,8 @@ Lessons from the build: `process_takes.py` now finds speech in the **enhanced** 
 
 ## 4. Tooling: this repo's copy is the 2 Oct scaffold; video 3's is newer
 
+**Synced on 10 Oct 2026:** the seven scripts below and `our_scenes/kit.py` were copied from video 3, the `instructions.md` changes carried over, and `our_scenes/agent_kit.py` copied whole (for the dial, the icons and `AgentScene`); video 4's own kit is `our_scenes/rl_kit.py`. The table is kept as the record.
+
 Files that changed in `../ai-agents-explainer` after the scaffold (the generic ones are worth copying before work starts):
 
 | File | What changed |

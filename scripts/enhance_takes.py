@@ -11,7 +11,7 @@ session has expired, sign in again with:  .venv/bin/python scripts/adobe_enhance
 
 Only lines marked ready in config/narration_ar.json are sent, and a take already enhanced is
 skipped, so a re-recorded line costs one upload. scripts/process_takes.py then trims and levels
-the enhanced audio (the cuts are measured on the raw take, so the line lengths don't change).
+the enhanced audio (finding the speech in it: Adobe's silence is clean where the raw take's isn't).
 
 Run:  .venv/bin/python scripts/enhance_takes.py [--dry-run]
 """
@@ -44,7 +44,7 @@ def chosen_takes() -> list[Path]:
     for key, text in ready.items():
         rec = manifest.get(key) or {}
         take = next((t for t in rec.get("takes", []) if t["file"] == rec.get("chosen")), None)
-        if take and take["text"] == text:
+        if take and take.get("says", take["text"]) == text:   # "says": marked current in the recorder
             out.append(TAKES / "takes" / take["file"])
         else:
             stale.append(key)

@@ -141,7 +141,9 @@ def main() -> None:
     data = load_manifest(manifest_path)
     seg = next((s for s in data["segments"] if s.get("id") == args.segment), None)
     if seg is None:
-        sys.exit(f"Unknown segment id: {args.segment!r}")
+        if args.video is None:
+            sys.exit(f"Unknown segment id: {args.segment!r}")
+        seg = {"id": args.segment}   # a test render (e.g. KitDemo): --video says which file
 
     video = resolve_video(REPO_ROOT, seg, args.video)
     duration = ffprobe_duration(video)

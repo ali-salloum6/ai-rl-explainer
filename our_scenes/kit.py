@@ -884,12 +884,17 @@ def flip_card(card_front: VGroup, card_back: VGroup, run_time: float = 0.5) -> A
 # Writer devices
 # ----------------------------------------------------------------------------
 def cursor(height: float = 0.5) -> VMobject:
-    """Text-cursor bar in ACCENT."""
-    w = 0.14 * height
-    bar = RoundedRectangle(width=w, height=height, corner_radius=0.45 * w)
-    bar.set_fill(ACCENT, opacity=1.0)
-    bar.set_stroke(width=0)
-    return bar
+    """Text cursor in ACCENT: an I-beam, a stem with a short horizontal bar at the top and at the bottom."""
+    h = height
+    stem, bar, wide = 0.10 * h, 0.10 * h, 0.40 * h          # stem width, bar thickness, bar width
+    pts = [(-wide / 2, h / 2), (wide / 2, h / 2), (wide / 2, h / 2 - bar), (stem / 2, h / 2 - bar),
+           (stem / 2, bar - h / 2), (wide / 2, bar - h / 2), (wide / 2, -h / 2), (-wide / 2, -h / 2),
+           (-wide / 2, bar - h / 2), (-stem / 2, bar - h / 2), (-stem / 2, h / 2 - bar), (-wide / 2, h / 2 - bar)]
+    beam = Polygon(*[np.array([x, y, 0.0]) for x, y in pts])
+    beam.round_corners(0.03 * h)
+    beam.set_fill(ACCENT, opacity=1.0)
+    beam.set_stroke(width=0)
+    return beam
 
 
 def blink(cursor_mob: Mobject, n: int = 2, period: float = 0.5) -> Animation:
@@ -1186,9 +1191,10 @@ from contextlib import contextmanager as _contextmanager
 NARRATION_PATH = REPO_ROOT / "config" / "narration.json"      # keys, pauses, English text
 NARRATION_AR_PATH = REPO_ROOT / "config" / "narration_ar.json"  # Ali's Arabic text per key
 # Which narration the scenes are timed to: "ar" = Ali's recorded Arabic (cleaned by
-# scripts/process_takes.py), "en" = the AI English placeholder. Set VO_LANG=en to render English.
+# scripts/process_takes.py), "ar_tts" = the offline Arabic placeholder voice (scripts/voice_ar_tts.py),
+# "en" = the AI English placeholder. Set VO_LANG=ar_tts or VO_LANG=en to render with those.
 VO_LANG = os.environ.get("VO_LANG", "ar")
-LINES_DIR = MEDIA_DIR / "audio" / ("lines" if VO_LANG == "en" else "lines_ar/clean")
+LINES_DIR = MEDIA_DIR / "audio" / {"en": "lines", "ar_tts": "lines_ar/tts"}.get(VO_LANG, "lines_ar/clean")
 LINES_INDEX = LINES_DIR / "index.json"
 TIMING_DIR = MEDIA_DIR / "timing"
 LINE_PAUSE = 0.4       # default breath after a line (a line's own `pause` in narration.json wins)
@@ -1197,7 +1203,7 @@ _EST_WORDS_PER_S = 2.6  # placeholder pace for lines that have not been voiced y
 
 @lru_cache(maxsize=1)
 def _narration() -> dict[str, str]:
-    if VO_LANG == "ar":
+    if VO_LANG in ("ar", "ar_tts"):
         doc = _json.loads(NARRATION_AR_PATH.read_text(encoding="utf-8"))
         return {ln["key"]: ln["ar"] for seg in doc["segments"] for ln in seg["lines"] if ln.get("status") == "ready"}
     doc = _json.loads(NARRATION_PATH.read_text(encoding="utf-8"))
@@ -1227,7 +1233,7 @@ def line_text(key: str) -> str:
 def by_lang(en: float, ar: float) -> float:
     """A value that depends on the narration language, e.g. where a word falls in a line:
     self.beat_to(ln, by_lang(en=0.30, ar=0.41))."""
-    return ar if VO_LANG == "ar" else en
+    return en if VO_LANG == "en" else ar
 
 
 def line_phrases(key: str) -> list[tuple[float, float]]:
@@ -1237,6 +1243,10 @@ def line_phrases(key: str) -> list[tuple[float, float]]:
     if entry.get("text") != line_text(key):      # a recording of older wording says nothing here
         return []
     return [tuple(p) for p in entry.get("phrases", [])]
+
+
+_PIN_TOL = 0.12   # a pause is pinned to a punctuation mark only this close (in shares of the line); Ali also
+                  # breathes where there is no comma, and pinning that to a far mark put words seconds early
 
 
 def line_word_at(key: str, needle: str) -> float:
@@ -1264,8 +1274,8 @@ def line_word_at(key: str, needle: str) -> float:
         options = [(abs(x - cum_t / voiced), k) for k, x in enumerate(marks) if k > used]
         if not options:
             break
-        _, k = min(options)
-        if marks[k] <= knots_x[-1]:
+        d, k = min(options)
+        if d > _PIN_TOL or marks[k] <= knots_x[-1]:   # a breath with no punctuation near it stays unpinned
             continue
         knots_x.append(marks[k]); knots_t.append(cum_t); used = k
     knots_x.append(1.0); knots_t.append(voiced)
