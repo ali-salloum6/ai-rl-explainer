@@ -15,4 +15,7 @@ if [ ! -x "$VENV/bin/python" ]; then
 fi
 "$VENV/bin/pip" install -q --upgrade pip setuptools wheel
 "$VENV/bin/pip" install -q -r "$(dirname "$0")/requirements.txt"
+# Manim encodes scene clips at CRF 23; use 18 (visually lossless) for crisp text on the dark gradient.
+WRITER=$("$VENV/bin/python" -c "import manim.scene.scene_file_writer as m; print(m.__file__)")
+sed -i 's/"crf": "23"/"crf": "18"/' "$WRITER"
 echo "ready: use $VENV/bin/python build.py ..."

@@ -47,6 +47,10 @@ $PY build.py assemble -q h            # -> output/its_just_timestamps.mp4 (+ .sr
 $PY build.py all
 ```
 
+Outputs land in `output/`: the MP4 (H.264 + AAC, soft English subtitle track), `its_just_timestamps.srt`,
+and `chapters.txt` (YouTube-style chapter timestamps). A full 1080p60 render takes about 45 minutes on
+4 cores. `-q p` (1440p60) and `-q k` (2160p60) also work and take proportionally longer.
+
 - The cloud environment must allow `api.openai.com` (Network access → Allowed domains).
 - `voice` caches clips by text, voice, model and instructions, so re-runs only synthesize what changed.
 - Voice options: `--voice marin` (or any OpenAI voice), `TTS_MODEL=...`, `TTS_SPEED=0.95`, and
