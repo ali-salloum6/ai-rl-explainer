@@ -70,6 +70,7 @@ tools/tts_openai.py    OpenAI TTS + whisper alignment -> audio/*.wav, audio/timi
 tools/music.py         procedural ambient score and sound effects (no licensed audio)
 tools/assemble.py      concat scenes, place clips on the timeline, duck the score, SRT, loudnorm -16 LUFS
 tools/contact_sheet.py frame grids for reviewing renders
+tools/qa_edges.py      flags any frame where content touches the screen edge
 build.py               orchestration (parallel renders)
 ```
 
