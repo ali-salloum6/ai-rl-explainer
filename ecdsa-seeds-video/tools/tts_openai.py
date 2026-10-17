@@ -138,29 +138,35 @@ def main():
         h = clip_hash(seg.spoken, args.model, args.voice, instructions, args.speed)
         wav = AUDIO_DIR / f"{seg.id}.wav"
         old = timings.get(seg.id)
-        if not args.force and old and old.get("hash") == h and wav.exists() and (old.get("words") or args.no_align):
-            return seg.id, old, "cached"
-        raw = AUDIO_DIR / "raw" / f"{seg.id}.wav"
-        for attempt in range(4):
-            try:
-                synthesize(client, seg.spoken, raw, args.model, args.voice, instructions, args.speed)
-                break
-            except Exception as exc:  # network hiccups, rate limits
-                if attempt == 3:
-                    raise
-                print(f"  {seg.id}: retry after {exc!r}", flush=True)
-                time.sleep(2 ** (attempt + 1))
-        clean(raw, wav)
-        entry = {"file": wav.name, "duration": round(duration_of(wav), 3), "hash": h,
-                 "voice": args.voice, "model": args.model}
+        if not args.force and old and old.get("hash") == h and wav.exists():
+            if old.get("words") or args.no_align:
+                return seg.id, old, "cached"
+            entry, status = dict(old), "re-aligned"  # audio is fine; only the word timings are missing
+        else:
+            raw = AUDIO_DIR / "raw" / f"{seg.id}.wav"
+            for attempt in range(4):
+                try:
+                    synthesize(client, seg.spoken, raw, args.model, args.voice, instructions, args.speed)
+                    break
+                except Exception as exc:  # network hiccups, rate limits
+                    if attempt == 3:
+                        raise
+                    print(f"  {seg.id}: retry after {exc!r}", flush=True)
+                    time.sleep(2 ** (attempt + 1))
+            clean(raw, wav)
+            entry = {"file": wav.name, "duration": round(duration_of(wav), 3), "hash": h,
+                     "voice": args.voice, "model": args.model}
+            status = "new"
         if not args.no_align:
             try:
                 words = align(client, wav, seg.spoken)
                 if words:
                     entry["words"] = words
+                else:
+                    print(f"  {seg.id}: whisper heard no matching words; using proportional timing", flush=True)
             except Exception as exc:
                 print(f"  {seg.id}: alignment failed ({exc!r}); using proportional timing", flush=True)
-        return seg.id, entry, "new"
+        return seg.id, entry, status
 
     todo = [s for s in segs.values() if not only or s.id in only]
     print(f"voice={args.voice} model={args.model}: {len(todo)} segments")

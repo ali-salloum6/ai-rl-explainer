@@ -19,7 +19,7 @@ words.filippo.io/seeds-solved, Koblitz & Menezes "A Riddle Wrapped in an Enigma"
 
 [c3] And yet, for all that time, {q}nobody could say where it came from. {crypto}Not the cryptographers who studied it. Apparently, {nobody}not even the people who made it.
 
-[c4] Some suspected {door}it hid a backdoor. Two well-known mathematicians called it {riddle}"a riddle wrapped in an enigma." And {bounty}a bounty of nearly thirty-seven thousand dollars sat {unclaimed}unclaimed for three years.
+[c4] Some suspected {door}it hid a backdoor. Two leading cryptographers wrote about the controversy in a paper titled {riddle}"A Riddle Wrapped in an Enigma." And {bounty}a bounty of nearly thirty-seven thousand dollars sat {unclaimed}unclaimed for three years.
 
 [c5] Then, on {date}October sixteenth, 2026, {anth}Anthropic announced that {claude}Claude had solved the mystery, {fast}in under half an hour.
 

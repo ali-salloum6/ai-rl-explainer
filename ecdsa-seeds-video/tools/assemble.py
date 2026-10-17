@@ -155,6 +155,18 @@ def write_srt(cues, path: Path):
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def write_chapters(order, files, offsets, path: Path):
+    """YouTube-style chapter list, using each scene's chapter card title."""
+    lines = []
+    for name, off in zip(order, offsets):
+        src = (ROOT / "scenes" / f"{files[name]}.py").read_text()
+        m = re.search(r'self\.chapter\(\s*\d+\s*,\s*"([^"]+)"', src)
+        title = m.group(1) if m else "Intro: the 25-year-old mystery"
+        mm, ss = divmod(int(off), 60)
+        lines.append(f"{mm:02d}:{ss:02d} {title}")
+    path.write_text("\n".join(lines) + "\n")
+
+
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -230,6 +242,8 @@ def main():
     has_voice = len(missing) < len(segs)
     srt = OUT / ("its_just_timestamps.srt" if not args.scenes else "partial.srt")
     write_srt(cues, srt)
+    if not args.scenes:
+        write_chapters(order, files, offsets, OUT / "chapters.txt")
 
     # 3. score + effects, levelled against the voice
     voice_rms = float(np.sqrt(np.mean(voice[np.abs(voice) > 0.01] ** 2))) if has_voice else db(-20)
@@ -287,7 +301,7 @@ def main():
     if not args.burn_subs:
         cmd += ["-map", "2:s", "-c:s", "mov_text", "-metadata:s:s:0", "language=eng"]
     cmd += vf
-    cmd += ["-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p"] if vf else ["-c:v", "copy"]
+    cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p"] if vf else ["-c:v", "copy"]
     target = -16 if has_voice else -24  # without a voice the score must stay a background bed
     cmd += ["-af", f"loudnorm=I={target}:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "192k",
             "-movflags", "+faststart", "-shortest", str(out)]
