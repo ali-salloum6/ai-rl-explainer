@@ -2,7 +2,7 @@
 """Build "It's Just Timestamps".
 
     python build.py preview                 # fast 480p silent preview with burned-in captions
-    python build.py voice                   # OpenAI TTS for every segment (needs OPENAI_API_KEY)
+    python build.py voice                   # TTS for every segment (ElevenLabs or OpenAI, by which key is set)
     python build.py render -q h             # render all scenes at 1080p60 (parallel)
     python build.py assemble -q h           # concat + voice + score + subtitles -> output/
     python build.py all                     # voice (if a key is set) + render + assemble, 1080p60
@@ -85,12 +85,22 @@ def main():
     ap.add_argument("-j", "--jobs", type=int, default=max(1, (os.cpu_count() or 2)))
     ap.add_argument("--scenes", default="", help="comma-separated scene names to render")
     ap.add_argument("--burn-subs", action="store_true")
-    ap.add_argument("--voice", default=None, help="OpenAI voice (default cedar)")
+    ap.add_argument("--voice", default=None, help="voice name/id (ElevenLabs default George, OpenAI default cedar)")
+    ap.add_argument("--engine", choices=["elevenlabs", "openai"], default=None,
+                    help="TTS engine; default: whichever API key is set (ElevenLabs first)")
     a, extra = ap.parse_known_args()  # anything unrecognised is passed on to tools/tts_openai.py
     only = [s for s in a.scenes.split(",") if s] or None
 
+    eleven_vars = ("ELEVENLABS_API_KEY", "XI_API_KEY", "ELEVEN_API_KEY")
+    engine = a.engine or ("elevenlabs" if any(os.environ.get(v) for v in eleven_vars)
+                          else "openai" if os.environ.get("OPENAI_API_KEY") else None)
+
     def voice():
-        cmd = [PY, "tools/tts_openai.py"] + (["--voice", a.voice] if a.voice else []) + extra
+        if engine is None:
+            sys.exit("no TTS key found: set ELEVENLABS_API_KEY or OPENAI_API_KEY, or pass --engine elevenlabs "
+                     "when the key is injected as a network secret")
+        tool = "tools/tts_elevenlabs.py" if engine == "elevenlabs" else "tools/tts_openai.py"
+        cmd = [PY, tool] + (["--voice", a.voice] if a.voice else []) + extra
         subprocess.run(cmd, cwd=ROOT, check=True)
 
     def assemble(q, burn, allow_missing):
@@ -106,12 +116,12 @@ def main():
     elif a.step == "render":
         render(a.quality, a.jobs, only)
     elif a.step == "assemble":
-        assemble(a.quality, a.burn_subs, not os.environ.get("OPENAI_API_KEY") and not (ROOT / "audio" / "timings.json").exists())
+        assemble(a.quality, a.burn_subs, not (ROOT / "audio" / "timings.json").exists())
     elif a.step == "all":
-        if os.environ.get("OPENAI_API_KEY"):
+        if engine:
             voice()
         else:
-            print("OPENAI_API_KEY not set: building with estimated timings and no voice")
+            print("no TTS key set: building with estimated timings and no voice")
         render(a.quality, a.jobs, only)
         assemble(a.quality, a.burn_subs, not (ROOT / "audio" / "timings.json").exists())
 

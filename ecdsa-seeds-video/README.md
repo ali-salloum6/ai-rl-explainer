@@ -36,28 +36,35 @@ PY=/opt/manim-venv/bin/python
 $PY build.py preview                  # 480p preview, no voice, captions burned in (~5 min)
 ```
 
-### Adding the voiceover (OpenAI TTS)
+### Adding the voiceover (ElevenLabs or OpenAI)
 
 ```bash
-export OPENAI_API_KEY=sk-...
-$PY build.py voice                    # 75 clips via gpt-4o-mini-tts (voice "cedar") + whisper word timings
+export ELEVENLABS_API_KEY=...         # or OPENAI_API_KEY=sk-...; ElevenLabs is used when both are set
+$PY build.py voice                    # 75 clips with exact word timings
 $PY build.py render -q h              # re-render all scenes at 1080p60, timed to the real clips
 $PY build.py assemble -q h            # -> output/its_just_timestamps.mp4 (+ .srt)
 # or all three at once:
 $PY build.py all
 ```
 
+- **ElevenLabs** (`tools/tts_elevenlabs.py`): `eleven_multilingual_v2`, voice "George" by default
+  (`--voice Brian`, any voice name or id in the account). Neighbouring lines are sent as context so the
+  delivery flows across clips, and the with-timestamps endpoint returns per-character timings. The
+  environment must allow `api.elevenlabs.io`. The full script is about 15,400 characters; the tool
+  checks the account's remaining quota before spending any.
+- **OpenAI** (`tools/tts_openai.py`): `gpt-4o-mini-tts`, voice "cedar", word timings from whisper-1.
+  The environment must allow `api.openai.com`.
+
 Outputs land in `output/`: the MP4 (H.264 + AAC, soft English subtitle track), `its_just_timestamps.srt`,
 and `chapters.txt` (YouTube-style chapter timestamps). A full 1080p60 render takes about 45 minutes on
 4 cores. `-q p` (1440p60) and `-q k` (2160p60) also work and take proportionally longer.
 
-- The cloud environment must allow `api.openai.com` (Network access → Allowed domains).
-- `voice` caches clips by text, voice, model and instructions, so re-runs only synthesize what changed.
-- Voice options: `--voice marin` (or any OpenAI voice), `TTS_MODEL=...`, `TTS_SPEED=0.95`, and
+- `voice` caches clips by text, voice, model and settings, so re-runs only synthesize what changed.
+- Other options: `TTS_MODEL=...`, `TTS_SPEED=0.95`, and for OpenAI
   `python tools/tts_openai.py --instructions-file my_style.txt` for a different delivery.
 - Picture and voice are synchronised per segment *and* per word. Each `{mark}` in `script.md`
-  is matched to the spoken word after it using whisper word timestamps. Visual beats land on
-  that word, and the scenes stretch to the real clip lengths.
+  is matched to the spoken word after it. Visual beats land on that word, and the scenes
+  stretch to the real clip lengths.
 
 ## How it fits together
 
@@ -66,6 +73,7 @@ script.md              narration: segments [id], sync marks {mark}, [[display|sp
 scenes/common.py       palette, typography, icons, VOScene (segment timing, chapter cards, SFX cues)
 scenes/s00…s09_*.py    one Manim scene per chapter
 tools/narration.py     script parser; durations/marks from audio/timings.json or a speaking-rate estimate
+tools/tts_elevenlabs.py ElevenLabs TTS with character timestamps -> audio/*.wav, audio/timings.json
 tools/tts_openai.py    OpenAI TTS + whisper alignment -> audio/*.wav, audio/timings.json
 tools/music.py         procedural ambient score and sound effects (no licensed audio)
 tools/assemble.py      concat scenes, place clips on the timeline, duck the score, SRT, loudnorm -16 LUFS
