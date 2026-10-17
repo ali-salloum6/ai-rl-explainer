@@ -315,7 +315,7 @@ class Rewind(VOScene):
             n_live.clear_updaters()
             c_live.clear_updaters()
             final_seed = Mono(hexgroups(candidate(1842)), 30, YELLOW, weight=BOLD).move_to(c_live)
-            p256 = pill("P-256", BLUE, size=26).next_to(final_seed, RIGHT, buff=0.3)
+            p256 = pill("P-256", BLUE, size=26).next_to(n_live, RIGHT, buff=0.4)
             self.play(Transform(c_live, final_seed), FadeIn(p256, shift=0.1 * LEFT), run_time=0.5)
 
         # ---------------------------------------------------------- w7: binary curves halved the clock
