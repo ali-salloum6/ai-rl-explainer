@@ -1,7 +1,7 @@
 """Assemble the final film from the rendered scenes.
 
 1. Concatenates the scene renders in script order.
-2. Lays every voice clip (audio/<id>.wav) at the exact time its scene started that segment.
+2. Lays every voice clip (audio/<id>.flac) at the exact time its scene started that segment.
 3. Adds the procedural score (ducked under the voice) and sound-effect cues.
 4. Writes subtitles (SRT, soft track) and loudness-normalises the mix to -16 LUFS.
 
@@ -52,17 +52,11 @@ def scene_files() -> dict[str, str]:
     return files
 
 
-def read_wav(path: Path) -> np.ndarray:
-    with wave.open(str(path)) as w:
-        assert w.getsampwidth() == 2, path
-        data = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
-        ch = w.getnchannels()
-        rate = w.getframerate()
-    data = data.reshape(-1, ch).mean(axis=1)
-    if rate != SR:
-        n = int(len(data) * SR / rate)
-        data = np.interp(np.linspace(0, len(data) - 1, n), np.arange(len(data)), data)
-    return data
+def read_audio(path: Path) -> np.ndarray:
+    """Mono float samples at SR from any file ffmpeg can read (the voice clips are FLAC)."""
+    pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", str(path), "-f", "s16le", "-ac", "1", "-ar", str(SR), "-"],
+                         check=True, capture_output=True).stdout
+    return np.frombuffer(pcm, dtype=np.int16).astype(np.float32) / 32768
 
 
 def write_wav(path: Path, x: np.ndarray):
@@ -233,7 +227,7 @@ def main():
             if path is None:
                 missing.append(seg.id)
                 continue
-            clip = read_wav(path)
+            clip = read_audio(path)
             i0 = int(round(start * SR))
             voice[i0:i0 + len(clip)] += clip[: max(0, n - i0)]
     if missing and not args.allow_missing_voice:
@@ -304,7 +298,7 @@ def main():
     cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18", "-pix_fmt", "yuv420p"] if vf else ["-c:v", "copy"]
     target = -16 if has_voice else -24  # without a voice the score must stay a background bed
     cmd += ["-af", f"loudnorm=I={target}:TP=-1.5:LRA=11", "-ar", "48000", "-c:a", "aac", "-b:a", "192k",
-            "-movflags", "+faststart", "-shortest", str(out)]
+            "-movflags", "+faststart", str(out)]  # no -shortest: it would stop at the last subtitle cue
     sh(cmd)
     print(f"wrote {out} ({probe_duration(out) / 60:.2f} min) and {srt}")
 

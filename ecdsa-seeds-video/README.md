@@ -59,6 +59,9 @@ Outputs land in `output/`: the MP4 (H.264 + AAC, soft English subtitle track), `
 and `chapters.txt` (YouTube-style chapter timestamps). A full 1080p60 render takes about 45 minutes on
 4 cores. `-q p` (1440p60) and `-q k` (2160p60) also work and take proportionally longer.
 
+- The voiceover in `audio/` is already generated (ElevenLabs `eleven_v4_turbo`, voice "George") and
+  committed as lossless FLAC with its word timings, so `render` + `assemble` rebuild the narrated film
+  without spending any TTS credits.
 - `voice` caches clips by text, voice, model and settings, so re-runs only synthesize what changed.
 - Other options: `TTS_MODEL=...`, `TTS_SPEED=0.95`, and for OpenAI
   `python tools/tts_openai.py --instructions-file my_style.txt` for a different delivery.
@@ -73,8 +76,8 @@ script.md              narration: segments [id], sync marks {mark}, [[display|sp
 scenes/common.py       palette, typography, icons, VOScene (segment timing, chapter cards, SFX cues)
 scenes/s00…s09_*.py    one Manim scene per chapter
 tools/narration.py     script parser; durations/marks from audio/timings.json or a speaking-rate estimate
-tools/tts_elevenlabs.py ElevenLabs TTS with character timestamps -> audio/*.wav, audio/timings.json
-tools/tts_openai.py    OpenAI TTS + whisper alignment -> audio/*.wav, audio/timings.json
+tools/tts_elevenlabs.py ElevenLabs TTS with character timestamps -> audio/*.flac, audio/timings.json
+tools/tts_openai.py    OpenAI TTS + whisper alignment -> audio/*.flac, audio/timings.json
 tools/music.py         procedural ambient score and sound effects (no licensed audio)
 tools/assemble.py      concat scenes, place clips on the timeline, duck the score, SRT, loudnorm -16 LUFS
 tools/contact_sheet.py frame grids for reviewing renders

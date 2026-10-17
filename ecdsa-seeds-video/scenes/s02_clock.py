@@ -159,7 +159,8 @@ class ClockArithmetic(VOScene):
             v.wait_until("plot", offset=-0.2)
             self.play(FadeOut(VGroup(face, ring_ticks, ring_nums, p_lab, dots, land, spiral, rows, laps)),
                       Create(axes), FadeIn(xl), FadeIn(yl), FadeIn(ticks_lab), run_time=0.7)
-            self.play(LaggedStart(*[FadeIn(d, scale=2) for d in sdots], lag_ratio=0.06), run_time=1.3)
+            self.play(LaggedStart(*[FadeIn(d, scale=2) for d in sdots], lag_ratio=0.06),
+                      run_time=min(1.3, max(0.6, v.until("random") - 0.15)))
             zig = VMobject(stroke_color=BLUE, stroke_width=1.6, stroke_opacity=0.45).set_points_as_corners(pts)
             noise = B("no pattern to follow", 38, MUTED).move_to(UP * 3.05)
             v.wait_until("random", offset=-0.1)

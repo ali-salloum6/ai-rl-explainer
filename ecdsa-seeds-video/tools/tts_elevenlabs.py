@@ -2,7 +2,7 @@
 
 Uses the text-to-speech "with-timestamps" endpoint, which returns character-level
 alignment with the audio, so every word's timing is exact and no transcription pass is
-needed. Writes audio/<id>.wav (48 kHz mono, trimmed to the speech) and audio/timings.json.
+needed. Writes audio/<id>.flac (48 kHz mono, trimmed to the speech) and audio/timings.json.
 
     ELEVENLABS_API_KEY=... python tools/tts_elevenlabs.py [--voice George] [--model eleven_multilingual_v2]
 
@@ -148,7 +148,16 @@ def main():
     except urllib.error.URLError as e:
         sys.exit(f"cannot reach api.elevenlabs.io ({e.reason}); add it to the environment's allowed domains")
     voice_id, voice_name = pick_voice(args.voice)
+    models = {m["model_id"]: m for m in call_retrying("GET", "/models")}
+    if args.model not in models:
+        sys.exit(f"model {args.model!r} not available; choose from {', '.join(models)}")
+    meta = models[args.model]
+    cost = float((meta.get("model_rates") or {}).get("character_cost_multiplier", 1.0))
     settings = dict(SETTINGS, speed=args.speed)
+    if not meta.get("can_use_style", True):
+        settings.pop("style", None)
+    if not meta.get("can_use_speaker_boost", True):
+        settings.pop("use_speaker_boost", None)
     tier = str(sub.get("tier", "")).lower()
     formats = ["pcm_44100"] if tier in HIGH_TIERS else []
     formats += ["pcm_24000", "mp3_44100_128"]
@@ -166,19 +175,20 @@ def main():
 
     todo = [s for s in order if (not only or s.id in only)]
     fresh = [s for s in todo if args.force or timings.get(s.id, {}).get("hash") != h_of(s)
-             or not (AUDIO_DIR / f"{s.id}.wav").exists()]
+             or not (AUDIO_DIR / f"{s.id}.flac").exists()]
     fresh_ids = {s.id for s in fresh}
-    need = sum(len(s.spoken) for s in fresh)
+    need = int(sum(len(s.spoken) for s in fresh) * cost + 0.999)
     left = int(sub.get("character_limit", 0)) - int(sub.get("character_count", 0))
     print(f"voice={voice_name} ({voice_id}) model={args.model} tier={tier or '?'}: "
-          f"{len(fresh)}/{len(todo)} clips to synthesize, {need:,} characters, {left:,} left this period")
+          f"{len(fresh)}/{len(todo)} clips to synthesize, {need:,} credits (x{cost:g} per character), "
+          f"{left:,} left this period")
     if need > left and not args.ignore_quota:
         sys.exit("not enough ElevenLabs characters left for this run (use --only to do part of it, "
                  "or --ignore-quota to try anyway)")
 
     def work(seg):
         h = h_of(seg)
-        wav = AUDIO_DIR / f"{seg.id}.wav"
+        wav = AUDIO_DIR / f"{seg.id}.flac"
         if seg.id not in fresh_ids:
             return seg.id, timings[seg.id], "cached"
         i = order.index(seg)
@@ -192,6 +202,11 @@ def main():
                                      query=f"output_format={fmt}")
                 break
             except APIError as e:
+                if e.code in (400, 422) and ("previous_text" in e.body or "next_text" in e.body) \
+                        and ("previous_text" in body or "next_text" in body):
+                    body.pop("previous_text", None)
+                    body.pop("next_text", None)
+                    continue
                 if e.code in (400, 401, 403, 422) and "output_format" in e.body and len(formats) > 1:
                     with fmt_lock:
                         if formats[0] == fmt:
@@ -208,10 +223,11 @@ def main():
             else ["-i", str(raw)]
         raw_dur = len(audio) / 2 / int(fmt.split("_")[1]) if fmt.startswith("pcm") else duration_of(raw)
         t0 = max(0.0, starts[spoken_idx[0]] - 0.06)
-        t1 = min(raw_dur, ends[spoken_idx[-1]] + 0.18)
+        last_letter = max(k for k, ch in enumerate(seg.spoken) if ch.isalnum())
+        t1 = min(raw_dur, ends[last_letter] + 0.3)
         run(["ffmpeg", "-v", "error", "-y", *src, "-ss", f"{t0:.3f}", "-to", f"{t1:.3f}",
              "-af", "afade=t=in:d=0.012,areverse,afade=t=in:d=0.04,areverse",
-             "-ar", "48000", "-ac", "1", "-sample_fmt", "s16", str(wav)])
+             "-ar", "48000", "-ac", "1", "-sample_fmt", "s16", "-c:a", "flac", str(wav)])
         words = [{"w": m.group(0), "start": round(max(0.0, starts[m.start()] - t0), 3),
                   "end": round(max(0.0, ends[m.end() - 1] - t0), 3)} for m in WORD_RE.finditer(seg.spoken)]
         entry = {"file": wav.name, "duration": round(duration_of(wav), 3), "hash": h, "engine": "elevenlabs",

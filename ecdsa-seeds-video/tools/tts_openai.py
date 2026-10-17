@@ -1,6 +1,6 @@
 """Generate the voiceover with the OpenAI TTS API, one clip per script segment.
 
-Writes audio/<id>.wav (48 kHz mono, silence trimmed) and audio/timings.json with each
+Writes audio/<id>.flac (48 kHz mono, silence trimmed) and audio/timings.json with each
 clip's duration and, unless --no-align, word timings from whisper-1 that the scenes use
 to land visual beats on the right word.
 
@@ -71,7 +71,7 @@ def clean(raw: Path, out: Path):
            "areverse,silenceremove=start_periods=1:start_threshold=-48dB:start_silence=0.08,areverse,"
            "adelay=40:all=1,apad=pad_dur=0.06")
     run(["ffmpeg", "-v", "error", "-y", "-i", str(raw), "-af", flt, "-ar", "48000", "-ac", "1",
-         "-sample_fmt", "s16", str(out)])
+         "-sample_fmt", "s16", "-c:a", "flac", str(out)])
 
 
 def align(client, wav: Path, spoken: str) -> list[dict] | None:
@@ -136,7 +136,7 @@ def main():
 
     def work(seg):
         h = clip_hash(seg.spoken, args.model, args.voice, instructions, args.speed)
-        wav = AUDIO_DIR / f"{seg.id}.wav"
+        wav = AUDIO_DIR / f"{seg.id}.flac"
         old = timings.get(seg.id)
         if not args.force and old and old.get("hash") == h and wav.exists():
             if old.get("words") or args.no_align:

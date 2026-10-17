@@ -384,10 +384,8 @@ class Rewind(VOScene):
 
         # ---------------------------------------------------------- w9: the base points, and Lenstra
         with self.vo("w9") as v:
-            self.play(FadeOut(VGroup(box, tag, qlines, facts, real)), run_time=0.6)
             bonus = pill("BONUS", YELLOW, size=28).move_to(UP * 3.1)
-            v.wait_until("bonus", offset=-0.2)
-            self.play(FadeIn(bonus, scale=0.8), run_time=0.4)
+            self.play(FadeOut(VGroup(box, tag, qlines, facts, real)), FadeIn(bonus, scale=0.8), run_time=0.6)
             curve = mini_curve(BLUE, 2.4, stroke=5).move_to(LEFT * 4.3 + UP * 0.6)
             gdot = Dot(curve.point_from_proportion(0.78), radius=0.13, color=PURPLE)
             glab = MT(f'base point {span("G", PURPLE, True)}', 30, FG).next_to(curve, DOWN, buff=0.3)
