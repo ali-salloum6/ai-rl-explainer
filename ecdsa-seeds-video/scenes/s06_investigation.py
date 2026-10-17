@@ -304,9 +304,10 @@ class Investigation(VOScene):
             fp = icon_fingerprint(CLAUDE, 1.4).move_to(UP * 1.3)
             self.play(Create(fp), run_time=1.2)
             name = Mono("lrand48()", 110, CLAUDE, weight=BOLD).move_to(DOWN * 0.6)
-            glow = name.copy().set_fill(opacity=0).set_stroke(CLAUDE, 14, opacity=0.18)
+            glow = soft_glow(name, CLAUDE)
             v.wait_until("name", offset=-0.25)
-            self.play(FadeIn(name, scale=1.15), FadeIn(glow), fp.animate.scale(0.6).move_to(UP * 2.0), run_time=0.7)
+            self.play(FadeIn(glow, scale=1.15), FadeIn(name, scale=1.15), fp.animate.scale(0.6).move_to(UP * 2.0),
+                      run_time=0.7)
 
         # ---------------------------------------------------------- i6: how lrand48 works
         with self.vo("i6") as v:

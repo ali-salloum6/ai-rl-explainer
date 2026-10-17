@@ -102,6 +102,14 @@ def panel(width, height, color=PANEL, stroke=DIM, radius=0.18, opacity=1.0) -> R
                             stroke_color=stroke, stroke_width=1.5)
 
 
+def soft_glow(mob, color, layers=((20, 0.04), (11, 0.07), (5, 0.11))) -> VGroup:
+    """A soft halo for text: stacked translucent strokes with round joins (miter joins spike on sharp glyphs)."""
+    g = VGroup(*[mob.copy().set_fill(opacity=0).set_stroke(color, w, opacity=o) for w, o in layers])
+    for m in g.get_family():
+        m.joint_type = LineJointType.ROUND
+    return g
+
+
 def boxed(mob, color=DIM, buff=0.25, fill=PANEL, radius=0.15, stroke_width=1.5) -> VGroup:
     rect = SurroundingRectangle(mob, buff=buff, corner_radius=radius, color=color,
                                 stroke_width=stroke_width)

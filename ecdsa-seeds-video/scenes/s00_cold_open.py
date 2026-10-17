@@ -9,7 +9,7 @@ class ColdOpen(VOScene):
         with self.vo("c1") as v:
             seed = Mono(SEED, 48, FG, weight=BOLD)
             seed.scale_to_fit_width(min(seed.width, 12.8))
-            glow = seed.copy().set_fill(opacity=0).set_stroke(BLUE, 12, opacity=0.16)
+            glow = soft_glow(seed, BLUE)
             self.play(AddTextLetterByLetter(seed, time_per_char=0.045), run_time=1.8)
             self.add(glow)
             self.play(FadeIn(glow), run_time=0.6)
