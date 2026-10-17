@@ -1,6 +1,6 @@
 # It's Just Timestamps
 
-An animated explainer (≈18 min, 1080p60) about Anthropic's October 16, 2026 finding
+An animated explainer (≈20 min, 1080p60, narrated) about Anthropic's October 16, 2026 finding
 that Claude traced the origin of the NIST elliptic-curve seeds behind P-256 and its siblings.
 The seeds were not hashes of a secret phrase. They were the output of the C library's
 `lrand48`, seeded with Unix timestamps from 1997–98.
