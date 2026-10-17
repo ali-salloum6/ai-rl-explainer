@@ -1,0 +1,7 @@
+build/
+output/
+audio/raw/
+audio/*.wav
+__pycache__/
+*.pyc
+scenes/media/
